@@ -23,13 +23,13 @@ It includes:
 
 ---
 
-## 🌐 Live Demo
+## Live Demo
 Once Stage 1 is complete, the static site will be hosted:
 > [here](here)
 
 ---
 
-## 👥 Team
+## Team
 | Member | Role | Responsibility |
 |--------|------|----------------|
 | @apovilauskas | Architect | Defines project structure, logic, features, crates the overall plan |
