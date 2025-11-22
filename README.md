@@ -4,7 +4,7 @@ A Wordle clone with a **C backend** and **HTML/CSS frontend**, developed as a 3-
 
 ---
 
-## 🧠 Project Overview
+## Project Overview
 This project recreates the classic Wordle game.  
 It includes:
 - A **static web interface** (Stage 1)
@@ -13,18 +13,18 @@ It includes:
 
 ---
 
-## 🚀 Stages & Deadlines
+##Stages & Deadlines
 
-| Stage | Deadline | Description |
-|-------|-----------|-------------|
-| **Stage 1** | 30 Nov | Team, project idea, static web page, MP4 demo, report |
-| **Stage 2** | 21 Dec | Provide reusable C module (.c + .h), possible collaboration |
-| **Stage 3** | 11 Jan | Complete console app that generates HTML/CSS automatically |
+| Stage | Deadline |
+|-------|-----------|
+| **Stage 1** | 30 Nov |
+| **Stage 2** | 21 Dec | 
+| **Stage 3** | 11 Jan |
 
 ---
 
 ## 🌐 Live Demo
-Once Stage 1 is complete, the static site will be hosted via GitHub Pages:
+Once Stage 1 is complete, the static site will be hosted:
 > [here](here)
 
 ---
@@ -32,8 +32,11 @@ Once Stage 1 is complete, the static site will be hosted via GitHub Pages:
 ## 👥 Team
 | Member | Role | Responsibility |
 |--------|------|----------------|
-| [Name 1] | Frontend Developer | HTML/CSS design, layout |
-| [Name 2] | Backend Developer | C logic, console app |
-| [Name 3] | Documentation | Reports, presentation video |
+| @apovilauskas | Architect | Defines project structure, logic, features, crates the overall plan |
+| @apovilauskas | Exhibitor | Presents the final structure and mp4 of the demo, explain decisions |
+| [Name 3] | Designer (Frontend)| Creates the visual side, builds HTML, CSS layout |
+| [Name 3] | Builder (Backend) | Builds the functionality of code according to structure, implements C backend and frontend interactions |
+| [Name 3] | Critic | Reviews the code, structure and design, gives feedback on what to improve |
+| [Name 3] | Facilitator | Keeps the team organized and working smoothly, making sure deadlines are met |
 
 ---
