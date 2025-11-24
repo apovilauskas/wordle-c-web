@@ -8,6 +8,7 @@ body {
     flex-direction: column;    /* header on top, board below */
     justify-content: center;   /* center */
     align-items: center;       
+    min-height: 100vh;         /* full viewport height */
 }
 
 header {
@@ -27,7 +28,10 @@ header .title {
 }
 
 #board{
+    flex: 1;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;   /* rows stacked vertically */
     gap: 10px;                /* space between rows */
     margin: 20px auto;          /* center horizontally */
@@ -53,11 +57,12 @@ header .title {
 
 /* Keyboard styles */
 #keyboard {
-    width: 600px;               /* set the total width */
+    max-width: 600px;
     margin: 20px auto;
     display: flex;
     flex-direction: column;
     gap: 8px;                   /* space between rows */
+    width: 100%;
 }
 
 .key {
