@@ -11,7 +11,6 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 25px;
-    position: relative;
 }
 
 header .title {
@@ -21,4 +20,28 @@ header .title {
     position: absolute;
     left: 0;
     right: 0;
+}
+
+#board{
+    display: flex;
+    flex-direction: column;   /* rows stacked vertically */
+    gap: 10px;                /* space between rows */
+}
+
+.row {
+    display: flex;          /* Put elements next to each other */
+    gap: 5px;              /* Space between cells */
+}
+
+.tile{
+    width: 65px;
+    height: 65px;
+    border: 2px solid #d3d6da;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0 5px;
 }
