@@ -4,6 +4,10 @@ body {
     background-color: #f5f5f5; /* light background */
     margin: 0;
     padding: 0;
+    display: flex;             /* use flexbox for layout */
+    flex-direction: column;    /* header on top, board below */
+    justify-content: center;   /* horizontal centering */
+    align-items: center;       /* horizontal centering */
 }
 
 header {
