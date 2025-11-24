@@ -11,6 +11,7 @@ body {
     min-height: 100vh;         /* full viewport height */
 }
 
+/* Header styles */
 header {
     display: flex;
     justify-content: space-between;
@@ -27,6 +28,7 @@ header .title {
     right: 0;
 }
 
+/* Game board styles */
 #board{
     flex: 1;
     display: flex;
@@ -35,16 +37,22 @@ header .title {
     flex-direction: column;   /* rows stacked vertically */
     gap: 10px;                /* space between rows */
     margin: 20px auto;          /* center horizontally */
+    max-width: 400px;
+    width: 90%;  
 }
 
 .row {
     display: flex;          /* Put elements next to each other */
+    justify-content: space-between;
     gap: 5px;              /* Space between cells */
+    width: 100%; 
 }
 
 .tile{
-    width: 65px;
-    height: 65px;
+    flex: 1;
+    aspect-ratio: 1 / 1;    /* Tile will save square shape */
+    max-width: 65px;          
+    min-width: 40px; 
     border: 2px solid #d3d6da;
     display: flex;
     justify-content: center;
