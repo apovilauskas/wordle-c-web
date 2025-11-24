@@ -6,8 +6,8 @@ body {
     padding: 0;
     display: flex;             /* use flexbox for layout */
     flex-direction: column;    /* header on top, board below */
-    justify-content: center;   /* horizontal centering */
-    align-items: center;       /* horizontal centering */
+    justify-content: center;   /* center */
+    align-items: center;       
 }
 
 header {
@@ -30,6 +30,7 @@ header .title {
     display: flex;
     flex-direction: column;   /* rows stacked vertically */
     gap: 10px;                /* space between rows */
+    margin: 20px auto;          /* center horizontally */
 }
 
 .row {
@@ -48,4 +49,34 @@ header .title {
     font-weight: 700;
     text-transform: uppercase;
     margin: 0 5px;
+}
+
+/* Keyboard styles */
+#keyboard {
+    width: 600px;               /* set the total width */
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;                   /* space between rows */
+}
+
+.key {
+    height: 60px;
+    flex: 1;                  /* keys expand evenly */
+    margin: 0 4px;
+    background-color: #dfdfdf;
+    color: #000000;
+    border: none;
+    border-radius: 2px;
+    font-size: 18px;
+    font-weight: 550;
+    cursor: pointer;
+}
+
+.key-large {
+    flex: 1.5;
+}
+
+.spacer {
+    flex: 0.5;                /* smaller space */
 }
