@@ -35,8 +35,8 @@ header .title {
     justify-content: center;
     align-items: center;
     flex-direction: column;   /* rows stacked vertically */
-    gap: 10px;                /* space between rows */
-    margin: 20px auto;          /* center horizontally */
+    gap: 1vh;                /* space between rows */
+    margin: 2vh auto;          /* center horizontally */
     max-width: 400px;
     width: 90%;  
 }
@@ -51,7 +51,7 @@ header .title {
 .tile{
     flex: 1;
     aspect-ratio: 1 / 1;    /* Tile will save square shape */
-    max-width: 65px;          
+    max-width: 60px;          
     min-width: 40px; 
     border: 2px solid #d3d6da;
     display: flex;
@@ -93,3 +93,12 @@ header .title {
 .spacer {
     flex: 0.5;                /* smaller space */
 }
+
+#backspace {
+    /* icon "Backspace" by FortAwesome, licensed under CC Attribution License --> */
+    background-image: url('icons/backspace-svgrepo-com.svg');
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
