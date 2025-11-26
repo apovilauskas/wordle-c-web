@@ -15,9 +15,39 @@
             <!-- Tutorial message -->
             <div id="tutorial" class="modal">
                 <div class="modal-window">
-                    <a href="" class="close">x</a>
+                    <a href="#" class="close">x</a>
                     <h2>How to play</h2>
                     <p>Guess the word in 6 tries!</p>
+                    <p>Each guess must be a valid 5-letter word.</p>
+                    <p>After each submition tiles will change color to show how close you are.</p>
+
+                    <h3>Examples</h3>
+                        <div data-label="Row 1" class="row">
+                            <div class="tile correct">H</div>
+                            <div class="tile">E</div>
+                            <div class="tile">L</div>
+                            <div class="tile">L</div>
+                            <div class="tile">O</div>
+                         </div>
+                         <p>The letter H is in the word and in the correct spot.</p>
+
+                         <div data-label="Row 1" class="row">
+                            <div class="tile">T</div>
+                            <div class="tile">A</div>
+                            <div class="tile present">B</div>
+                            <div class="tile">L</div>
+                            <div class="tile">E</div>
+                         </div>
+                         <p>The letter B is in the word but in the wrong spot.</p>
+
+                         <div data-label="Row 1" class="row">
+                            <div class="tile">G</div>
+                            <div class="tile absent">R</div>
+                            <div class="tile">O</div>
+                            <div class="tile">U</div>
+                            <div class="tile">P</div>
+                         </div>
+                         <p>The letter R is not in the word in any spot.</p>
                 </div>
             </div>
 

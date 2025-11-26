@@ -76,6 +76,16 @@ header .title {
     margin: 0 5px;
 }
 
+.correct{
+    background-color: #6aaf64;
+}
+.present{
+    background-color: #cdcd59;
+}
+.absent{
+    background-color: #a3a3a3;
+}
+
 /* Keyboard styles */
 #keyboard {
     max-width: 600px;
