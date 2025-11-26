@@ -7,13 +7,24 @@
     </head>
     <body>
         <header>
-            <button id="help" class="icon">
+            <!-- Tutorial message button -->
+            <a href="#tutorial" id="help">
                 <!-- Icon "Question Filled " by Siemens, licensed under MIT License -->
                 <img src="icons/question-filled-svgrepo-com.svg" alt="Help" width="24" height="24">
-            </button>
+            </a>
+            <!-- Tutorial message -->
+            <div id="tutorial" class="modal">
+                <div class="modal-window">
+                    <a href="" class="close">x</a>
+                    <h2>How to play</h2>
+                    <p>Guess the word in 6 tries!</p>
+                </div>
+            </div>
 
+            <!-- Title -->
             <div class="title">WORDLE</div>
-
+            
+            <!-- Settings -->
             <button id="settings" class="icon">
                 <!-- Icon "settings" by iconhub, licensed under CC Attribution License -->
                 <img src="icons/settings-svgrepo-com.svg" alt="Settings" width="24" height="24"> 
