@@ -35,8 +35,8 @@ header .title {
     justify-content: center;
     align-items: center;
 
-    border: none;         /* убрать границы */
-    background: none;     /* убрать фон */
+    border: none;
+    background: none;     
     padding: 0;
     cursor: pointer;
 }
@@ -115,3 +115,38 @@ header .title {
     background-position: center;
 }
 
+/* Modal tutorial window */
+.modal {
+    position: fixed;
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0;
+
+    background: #00000089;
+    transition: .3s;
+
+    opacity: 0;     /* Hide overlay */
+    pointer-events: none;
+}
+
+.modal:target {
+    opacity: 1;     /* Shows overlay after targeting */
+    pointer-events: auto;
+}
+
+.modal-window {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 420px;
+    margin: 80px auto;
+}
+
+.close {
+    float: right;
+    text-decoration: none;  /* To remove hyperlink italic text effect "_" */
+    font-size: 32px;
+    color: #414141;
+}
