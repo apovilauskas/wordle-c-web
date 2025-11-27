@@ -61,6 +61,11 @@ header .title {
     flex: 1 1 0;
 }
 
+.adjustable {
+    width: 50%;
+    height: 50%;
+}
+
 .tile{
     flex: 1;
     aspect-ratio: 1 / 1;    /* Tile will stay square shaped */
@@ -137,6 +142,10 @@ header .title {
     bottom: 0; 
     left: 0;
 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     background: #00000089;
     transition: .3s;
 
@@ -151,10 +160,12 @@ header .title {
 
 .modal-window {
     background: #ffffff;
-    padding: 20px;
+    padding: 2vh 2vw;             /* adaptive padding */
     border-radius: 10px;
+
     width: 90%;
     max-width: 420px;
+
     margin: 80px auto;
 }
 
