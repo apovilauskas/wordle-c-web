@@ -43,13 +43,13 @@ header .title {
 
 /* Game board styles */
 #board{
+    margin: 5vh;
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;   /* rows stacked vertically */
-    gap: 1vh;                /* space between rows */
-    margin: 2vh auto;          /* center horizontally */
+    gap: 5px;                /* space between rows */
     max-width: 400px;
     width: 90%;  
 }
@@ -58,23 +58,27 @@ header .title {
     display: flex;          /* Put elements next to each other */
     justify-content: space-between;
     gap: 5px;              /* Space between cells */
-    width: 100%; 
+    flex: 1 1 0;
 }
 
 .tile{
     flex: 1;
-    aspect-ratio: 1 / 1;    /* Tile will save square shape */
-    max-width: 60px;          
-    min-width: 40px; 
+    aspect-ratio: 1 / 1;    /* Tile will stay square shaped */
+    min-width: 25px;  
+    min-height: 25px;  
     border: 2px solid #d3d6da;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 32px;
+    justify-content: center;
+
+    font-size: clamp(25px, 4vh, 32px);  /* Text will adjust to the tile size */
     font-weight: 700;
     text-transform: uppercase;
-    margin: 0 5px;
+
+    box-sizing: border-box;
 }
+
 
 .correct{
     background-color: #6aaf64;
