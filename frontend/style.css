@@ -125,7 +125,7 @@ header .title {
     background-position: center;
 }
 
-/* Modal tutorial window */
+/* Modal window */
 .modal {
     position: fixed;
     top: 0; 
@@ -159,4 +159,18 @@ header .title {
     text-decoration: none;  /* To remove hyperlink italic text effect "_" */
     font-size: 32px;
     color: #414141;
+}
+
+/* Settings */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+#dark-toggle {
+    width: 18px;
+    height: 18px;
 }
