@@ -25,7 +25,7 @@ It includes:
 
 ## Live Demo
 Once Stage 1 is complete, the static site will be hosted:
-> [here](here)
+> [here](https://github.com/apovilauskas/wordle-c-web)
 
 ---
 
