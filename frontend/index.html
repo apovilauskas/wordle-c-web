@@ -7,17 +7,71 @@
     </head>
     <body>
         <header>
-            <button id="help" class="icon">
+            <!-- Tutorial message button -->
+            <a href="#tutorial" class="icon">
                 <!-- Icon "Question Filled " by Siemens, licensed under MIT License -->
                 <img src="icons/question-filled-svgrepo-com.svg" alt="Help" width="24" height="24">
-            </button>
+            </a>
+                <!-- Tutorial modal message -->
+                <div id="tutorial" class="modal">
+                    <div class="modal-window">
+                        <a href="#" class="close">x</a>
+                        <h2>How to play</h2>
+                        <p>Guess the word in 6 tries!</p>
+                        <p>Each guess must be a valid 5-letter word.</p>
+                        <p>After each submition tiles will change color to show how close you are.</p>
 
+                        <h3>Examples</h3>
+                            <div class="row adjustable">
+                                <div class="tile correct">H</div>
+                                <div class="tile">E</div>
+                                <div class="tile">L</div>
+                                <div class="tile">L</div>
+                                <div class="tile">O</div>
+                            </div>
+                            <p>The letter H is in the word and in the correct spot.</p>
+
+                            <div class="row adjustable">
+                                <div class="tile">T</div>
+                                <div class="tile">A</div>
+                                <div class="tile present">B</div>
+                                <div class="tile">L</div>
+                                <div class="tile">E</div>
+                            </div>
+                            <p>The letter B is in the word but in the wrong spot.</p>
+
+                            <div class="row adjustable">
+                                <div class="tile">G</div>
+                                <div class="tile absent">R</div>
+                                <div class="tile">O</div>
+                                <div class="tile">U</div>
+                                <div class="tile">P</div>
+                            </div>
+                            <p>The letter R is not in the word in any spot.</p>
+                    </div>
+                </div>
+
+            <!-- Title -->
             <div class="title">WORDLE</div>
-
-            <button id="settings" class="icon">
+            
+            <!-- Settings -->
+            <a href="#settings" class="icon">
                 <!-- Icon "settings" by iconhub, licensed under CC Attribution License -->
                 <img src="icons/settings-svgrepo-com.svg" alt="Settings" width="24" height="24"> 
-            </button>
+            </a>
+                <!-- Settings modal message -->
+                <div id="settings" class="modal">
+                    <div class="modal-window">
+                        <a href="#" class="close">x</a>
+                        <h2>Settings</h2>
+
+                        <!-- Dark-toggle --> 
+                        <div class="setting-row">
+                            <label for="dark-toggle">Dark Theme</label>
+                            <input type="checkbox" id="dark-toggle">
+                        </div>
+                    </div>
+                </div>
         </header>
 
         <div id="board">
