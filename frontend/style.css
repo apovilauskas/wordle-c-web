@@ -35,21 +35,21 @@ header .title {
     justify-content: center;
     align-items: center;
 
-    border: none;         /* убрать границы */
-    background: none;     /* убрать фон */
+    border: none;
+    background: none;     
     padding: 0;
     cursor: pointer;
 }
 
 /* Game board styles */
 #board{
+    margin: 5vh;
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;   /* rows stacked vertically */
-    gap: 1vh;                /* space between rows */
-    margin: 2vh auto;          /* center horizontally */
+    gap: 5px;                /* space between rows */
     max-width: 400px;
     width: 90%;  
 }
@@ -58,22 +58,41 @@ header .title {
     display: flex;          /* Put elements next to each other */
     justify-content: space-between;
     gap: 5px;              /* Space between cells */
-    width: 100%; 
+    flex: 1 1 0;
+}
+
+.adjustable {
+    width: 50%;
+    height: 50%;
 }
 
 .tile{
     flex: 1;
-    aspect-ratio: 1 / 1;    /* Tile will save square shape */
-    max-width: 60px;          
-    min-width: 40px; 
+    aspect-ratio: 1 / 1;    /* Tile will stay square shaped */
+    min-width: 25px;  
+    min-height: 25px;  
     border: 2px solid #d3d6da;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 32px;
+    justify-content: center;
+
+    font-size: clamp(25px, 4vh, 32px);  /* Text will adjust to the tile size */
     font-weight: 700;
     text-transform: uppercase;
-    margin: 0 5px;
+
+    box-sizing: border-box;
+}
+
+
+.correct{
+    background-color: #6aaf64;
+}
+.present{
+    background-color: #cdcd59;
+}
+.absent{
+    background-color: #a3a3a3;
 }
 
 /* Keyboard styles */
@@ -115,3 +134,58 @@ header .title {
     background-position: center;
 }
 
+/* Modal window */
+.modal {
+    position: fixed;
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #00000089;
+    transition: .3s;
+
+    opacity: 0;     /* Hide overlay */
+    pointer-events: none;
+}
+
+.modal:target {
+    opacity: 1;     /* Shows overlay after targeting */
+    pointer-events: auto;
+}
+
+.modal-window {
+    background: #ffffff;
+    padding: 2vh 2vw;             /* adaptive padding */
+    border-radius: 10px;
+
+    width: 90%;
+    max-width: 420px;
+
+    margin: 80px auto;
+}
+
+.close {
+    float: right;
+    text-decoration: none;  /* To remove hyperlink italic text effect "_" */
+    font-size: 32px;
+    color: #414141;
+}
+
+/* Settings */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+#dark-toggle {
+    width: 18px;
+    height: 18px;
+}
