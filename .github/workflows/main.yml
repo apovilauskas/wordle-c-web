@@ -1,0 +1,39 @@
+name: Update Commit Leaderboard
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # every hour
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+      - uses: actions/checkout@v4
+
+      - name: Run leaderboard script
+        run: |
+          commits=$(curl -s "https://api.github.com/repos/${{ github.repository }}/contributors?per_page=100" \
+            | jq -r '.[] | "\(.login) \(.contributions)"' \
+            | sort -k2 -nr)
+
+          output="| Contributor | Commits |\n|-----------|---------|\n"
+          while read -r line; do
+            user=$(echo "$line" | awk '{print $1}')
+            count=$(echo "$line" | awk '{print $2}')
+            output="$output| $user | $count |\n"
+          done <<< "$commits"
+
+          sed -i "/<!-- LEADERBOARD_START -->/,/<!-- LEADERBOARD_END -->/c\<!-- LEADERBOARD_START -->\n$output\n<!-- LEADERBOARD_END -->" README.md
+
+      - name: Commit changes
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add README.md
+            git commit -m "Update leaderboard"
+            git push
+          fi
