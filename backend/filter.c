@@ -1,0 +1,1 @@
+// c program that takes words.txt as input and filters out words to only have the 5 letter ones, and then outputs the correct words back to words.txt, effectively making the document only have allowed words for wordle
