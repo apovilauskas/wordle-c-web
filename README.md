@@ -40,8 +40,3 @@ Once Stage 1 is complete, the static site will be hosted:
 | [Name 3] | Facilitator | Keeps the team organized and working smoothly, making sure deadlines are met |
 
 ---
-
-## 🏆 Commit Leaderboard
-<!-- LEADERBOARD_START -->
-Loading...
-<!-- LEADERBOARD_END -->
