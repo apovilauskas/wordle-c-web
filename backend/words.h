@@ -1,4 +1,4 @@
-#infdef WORDS_H
+#ifndef WORDS_H
 #define WORDS_H
 
 void loadDictionary(const char *filepath);
