@@ -1,4 +1,4 @@
-#infdef LOGIC_H
+#ifndef LOGIC_H
 #define LOGIC_H
 
 int* evaluateGuess(const char* secret_word, const char* guess);
