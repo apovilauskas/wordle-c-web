@@ -19,7 +19,8 @@ int main() {
 
     for (int i = 0; i < 5; i++)
     {
-        if (result[i] == 0) { // Only check if not already a perfect match
+        if (result[i] == 0) 
+        {
             for (int j = 0; j < 5; j++)
             {
                 if (i != j && input[i] == target[j] && result[j] != 2)
