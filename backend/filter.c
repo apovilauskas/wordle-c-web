@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(void)
+int main()
 {
     char buffer[128];
     FILE *fp = fopen("words.txt", "r");
