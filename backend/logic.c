@@ -1,54 +1,41 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+int main() {
+    char target[] = "hello";
+    char input[6];
+    int result[5] = {0};
 
-int main(void)
-{
-    char buffer[128];
-    FILE *fp = fopen("words.txt", "r");
-    if (fp==NULL)
+    printf("Enter a 5-letter word: ");
+    scanf("%5s", input);
+
+    for (int i = 0; i < 5; i++)
     {
-        perror("File open failed");
-        return 1;
+        if (input[i] == target[i])
+        {
+            result[i] = 2;
+        }
     }
 
-    int capacity = 10;
-    int count = 0;
-
-    char **words = malloc(capacity * sizeof(char*));
-
-    while (fgets(buffer, sizeof(buffer), fp))
-        {
-            buffer[strcspn(buffer, "\n")] = '\0';
-
-            if (strlen(buffer) == 5)
+    for (int i = 0; i < 5; i++)
+    {
+        if (result[i] == 0) { // Only check if not already a perfect match
+            for (int j = 0; j < 5; j++)
+            {
+                if (i != j && input[i] == target[j] && result[j] != 2)
                 {
-                    if (count == capacity)
-                    {
-                        capacity++;
-                        char **temp = realloc(words, capacity * sizeof(char*));
-                        words = temp;
-                    }
-
-                 words[count] = malloc(strlen(buffer) + 1);
-                 strcpy(words[count], buffer);
-                 count++;
+                    result[i] = 1;
+                    break;
                 }
+            }
         }
-        fclose(fp);
+    }
 
-        FILE *fp2 = fopen("words.txt", "w");
+    printf("Result:");
+    for (int i = 0; i < 5; i++)
+    {
+        printf("%d", result[i]);
+    }
 
-        for(int x=0;x<count;x++)
-        {
-            fprintf(fp2,"%s\n",words[x]);
-            free(words[x]);
-        }
-        free(words);
-        fclose(fp);
+    return 0;
 }
-
