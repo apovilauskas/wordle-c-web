@@ -91,6 +91,19 @@ function getCurrentWord() {
   return word;
 }
 
+function addLetter(letter) {
+  if (currentCol >= 5) {                  // if column limit reached
+    console.log("Column limit reached!");
+    return;
+  }
+  const board = document.getElementById("board"); // search for the board element
+  const rows = board.querySelectorAll(".row");  // get all rows
+  const row = rows[currentRow];           // choose the current row
+  const tile = row.children[currentCol]; // choose the current tile
+
+  tile.textContent = letter;              // enter the letter into the tile
+  ++currentCol;                           // move to the next column
+}
 
 // Initialize game on page load
 document.addEventListener('DOMContentLoaded', () => {
