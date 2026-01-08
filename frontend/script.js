@@ -1,6 +1,12 @@
 const API_URL = 'http://localhost:8080/api'; // Change for production
 let sessionId = null;
 
+const ROWS = 6;
+const COLS = 5;
+
+let currentRow = 0;  // global variable for current row
+let currentCol = 0;  // global variable for current column
+
 // Start new game
 async function startNewGame() {
     try {
@@ -22,51 +28,41 @@ async function startNewGame() {
 
 // Submit guess
 async function submitGuess(guess) {
-    if (!sessionId) {
-        alert('Please start a new game first');
-        return;
+    if (!sessionId) throw new Error("Game not started");
+
+    const response = await fetch(`${API_URL}/guess`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            guess: guess.toUpperCase(),
+            sessionId
+        })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || "Invalid guess");
     }
-    
-    try {
-        const response = await fetch(`${API_URL}/guess`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                guess: guess.toUpperCase(), 
-                sessionId: sessionId 
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            // data.result is like "01202"
-            // 0 = grey (not in word)
-            // 1 = yellow (wrong position)
-            // 2 = green (correct position)
-            updateBoard(data.result, guess);
-        } else {
-            alert(data.error);
-        }
-    } catch (error) {
-        console.error('Error submitting guess:', error);
-    }
+
+    data.result = "01220"; // Mocked result for testing
+
+    return data.result; // "01220"
 }
 
 // Update board with result
-function updateBoard(result, guess) {
-    const currentRow = document.querySelector('.row.active'); // Your current row
-    const tiles = currentRow.querySelectorAll('.tile');
-    
-    for (let i = 0; i < 5; i++) {
-        tiles[i].textContent = guess[i];
-        
+function updateBoard(result) {
+    const board = document.getElementById("board");
+    const row = board.querySelectorAll(".row")[currentRow];
+
+    for (let i = 0; i < result.length; i++) {
+        const tile = row.children[i];
         if (result[i] === '2') {
-            tiles[i].classList.add('correct'); // Green
+            tile.classList.add('correct'); // Green
         } else if (result[i] === '1') {
-            tiles[i].classList.add('present'); // Yellow
+            tile.classList.add('present'); // Yellow
         } else {
-            tiles[i].classList.add('absent'); // Grey
+            tile.classList.add('absent'); // Grey
         }
     }
     
@@ -84,7 +80,47 @@ function resetBoard() {
 // Initialize game on page load
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
-    
+
+    document.addEventListener("keydown", async (e) => {
+        if (e.key === "Backspace") {
+            removeLetter();
+            return;
+        }
+
+        if (e.key === "Enter") {
+            console.log("Enter pressed");
+
+            if (currentCol < COLS) {
+            console.log("Not enough letters");
+            return;
+            }
+
+            const word = getCurrentWord();
+
+            try {
+            const result = await submitGuess(word);
+            console.log(result);
+            updateBoard(result);
+
+            ++currentRow;     // next row
+            currentCol = 0;   // reset column
+
+            if (currentRow >= ROWS) {
+                console.log("Game over!");
+            }
+            } catch (err) {
+            console.error("Error in sending word", err);
+            }
+
+            return;
+        }
+
+        // letter input
+        if (/^[a-zA-Z]$/.test(e.key)) {
+            addLetter(e.key.toUpperCase());
+        }
+    }) 
     // Your existing keyboard/input handling here
     // When user presses Enter, call submitGuess(currentGuess)
 });
+
