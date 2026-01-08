@@ -105,6 +105,18 @@ function addLetter(letter) {
   ++currentCol;                           // move to the next column
 }
 
+function removeLetter() {
+  if (currentCol === 0) return;           // if at the beginning of the row, do nothing
+
+  --currentCol;                            // return to the previous column
+  const board = document.getElementById("board");
+  const rows = board.querySelectorAll(".row");
+  const row = rows[currentRow];
+  const tile = row.children[currentCol];
+
+  tile.textContent = " ";                   // clear the letter from the tile
+}
+
 // Initialize game on page load
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
