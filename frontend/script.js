@@ -77,6 +77,21 @@ function resetBoard() {
     // Your existing UI reset code
 }
 
+function getCurrentWord() {
+  const board = document.getElementById("board");
+  const rows = board.querySelectorAll(".row");
+  const row = rows[currentRow]; // current row
+
+  let word = "";
+  for (let i = 0; i < row.children.length; i++) {
+    const tile = row.children[i];
+    word += tile.textContent; // letters collection
+  }
+
+  return word;
+}
+
+
 // Initialize game on page load
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
