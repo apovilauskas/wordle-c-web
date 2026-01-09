@@ -45,9 +45,7 @@ async function submitGuess(guess) {
         throw new Error(data.error || "Invalid guess");
     }
 
-    data.result = "01220"; // Mocked result for testing
-
-    return data.result; // "01220"
+    return data.result;
 }
 
 // Update board with result
@@ -73,8 +71,27 @@ function updateBoard(result) {
 }
 
 function resetBoard() {
-    // Clear all tiles and reset to first row
-    // Your existing UI reset code
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+
+    rows.forEach((row, rowIndex) => {
+        row.classList.remove("active");
+
+        const tiles = row.querySelectorAll(".tile");
+        tiles.forEach(tile => {
+            tile.textContent = "";
+            tile.classList.remove("correct", "present", "absent");
+        });
+    });
+
+    // Reset game state
+    currentRow = 0;
+    currentCol = 0;
+
+    // Activate first row
+    if (rows.length > 0) {
+        rows[0].classList.add("active");
+    }
 }
 
 function getCurrentWord() {
