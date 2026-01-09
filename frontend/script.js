@@ -75,7 +75,6 @@ function resetBoard() {
     }
 }
 
-////////// Modal windows //////////
 // Update board with result
 function updateBoard(result) {
     const board = document.getElementById("board");
@@ -103,29 +102,23 @@ function updateBoard(result) {
 
     // Check if won
     setTimeout(() => {
-        if (result === '22222') showGameOver(true);
-        else if (currentRow >= ROWS) showGameOver(false);
-    }, result.length * 150 + 200);
+        if (result === '22222') showGameOver("You won!");
+        else if (currentRow >= ROWS) showGameOver("You lost! Better luck next time.");
+    }, 5000);
 }
 
+////////// Modal windows //////////
 function setupModal(modalId, triggerId) {
     const modal = document.getElementById(modalId);
-    const trigger = document.getElementById(triggerId);
 
-    // Open modal
-    if (trigger) {
-        trigger.addEventListener("click", () => {
-            modal.classList.remove("hidden");
-        });
+    // Open modal if trigger exists
+    if (triggerId) {
+        const trigger = document.getElementById(triggerId);
+        trigger?.addEventListener("click", () => modal.classList.remove("hidden"));
     }
 
     // Close modal
-    const closeBtn = modal.querySelector(".close");
-    if (closeBtn) {
-        closeBtn.addEventListener("click", () => {
-            modal.classList.add("hidden");
-        });
-    }
+    modal.querySelector(".close")?.addEventListener("click", () => modal.classList.add("hidden"));
 }
 
 // Initialize modals
@@ -133,16 +126,26 @@ setupModal("tutorial-modal", "tutorial-btn");
 setupModal("settings-modal", "settings-btn");
 setupModal("game-over-modal");
 
-function showGameOver(won) {
+// Game-over modal logic
+const gameOverModal = document.getElementById("game-over-modal");
+const gameOverMessage = document.getElementById("game-over-message");
+const newGameBtn = document.getElementById("new-game-btn");
+
+function showGameOver(msg) {
     inputBlocked = true;
-    const modal = document.getElementById("game-over-modal");
-    const message = document.getElementById("game-over-message");
-    message.textContent = won ? "You won!" : "You lost! Better luck next time.";
-    modal.classList.remove("hidden"); // Show modal
+    gameOverMessage.textContent = msg;
+    gameOverModal.classList.remove("hidden");
 }
-// Button to start a new game
-document.getElementById("new-game-btn").addEventListener("click", async () => {
-    document.getElementById("game-over-modal").classList.add("hidden");
+
+// "WORDLE" header click => ask for new game
+document.querySelector('.title').addEventListener("click", () => {
+    showGameOver("Try again?");
+});
+
+// New Game button (works both on game-over or header)
+newGameBtn.addEventListener("click", async () => {
+    gameOverModal.classList.add("hidden");
+    inputBlocked = false;
     await startNewGame();
 });
 

@@ -68,6 +68,7 @@ header .title {
     font-size: 36px;
     text-align: center;
     margin: 0 auto; 
+    cursor: pointer;
 }
 
 /* icon size */
