@@ -116,8 +116,12 @@ header .title {
     font-size: 18px;
     font-weight: 550;
     cursor: pointer;
-}
 
+    user-select: none;     
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    outline: none;
+}
 .key-large {
     flex: 1.5;
 }
@@ -202,4 +206,10 @@ header .title {
 
 .shake {
   animation: shake 0.5s;
+}
+
+/* Key press animation */
+.key.pressed {
+    transform: scale(0.92);
+    background-color: #cfcfcf;
 }

@@ -51,6 +51,31 @@ async function submitGuess(guess) {
     return data.result;
 }
 
+function resetBoard() {
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+
+    rows.forEach((row, rowIndex) => {
+        row.classList.remove("active");
+
+        const tiles = row.querySelectorAll(".tile");
+        tiles.forEach(tile => {
+            tile.textContent = "";
+            tile.classList.remove("correct", "present", "absent");
+        });
+    });
+
+    // Reset game state
+    currentRow = 0;
+    currentCol = 0;
+
+    // Activate first row
+    if (rows.length > 0) {
+        rows[0].classList.add("active");
+    }
+}
+
+////////// Modal windows //////////
 // Update board with result
 function updateBoard(result) {
     const board = document.getElementById("board");
@@ -121,30 +146,7 @@ document.getElementById("new-game-btn").addEventListener("click", async () => {
     await startNewGame();
 });
 
-function resetBoard() {
-    const board = document.getElementById("board");
-    const rows = board.querySelectorAll(".row");
-
-    rows.forEach((row, rowIndex) => {
-        row.classList.remove("active");
-
-        const tiles = row.querySelectorAll(".tile");
-        tiles.forEach(tile => {
-            tile.textContent = "";
-            tile.classList.remove("correct", "present", "absent");
-        });
-    });
-
-    // Reset game state
-    currentRow = 0;
-    currentCol = 0;
-
-    // Activate first row
-    if (rows.length > 0) {
-        rows[0].classList.add("active");
-    }
-}
-
+////////// Game Logic //////////
 function getCurrentWord() {
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
@@ -185,21 +187,6 @@ function removeLetter() {
     tile.textContent = "";                   // clear the letter from the tile
 }
 
-function shakeRow() {
-    const board = document.getElementById("board");
-    const rows = board.querySelectorAll(".row");
-    const row = rows[currentRow]; // current row
-
-    if (!row) return;
-
-    row.classList.add("shake");
-
-    // Remove the class after animation ends
-    row.addEventListener("animationend", () => {
-        row.classList.remove("shake");
-    }, { once: true });
-}
-
 async function handleEnter() {
     if (inputBlocked) return;
 
@@ -227,13 +214,41 @@ async function handleEnter() {
     inputBlocked = false;
 }
 
-// Initialize game on page load
+////////// Animations //////////
+function shakeRow() {
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+    const row = rows[currentRow]; // current row
+
+    if (!row) return;
+
+    row.classList.add("shake");
+
+    // Remove the class after animation ends
+    row.addEventListener("animationend", () => {
+        row.classList.remove("shake");
+    }, { once: true });
+}
+
+function pressKeyVisual(button) {
+    button.classList.add("pressed");
+    setTimeout(() => {
+        button.classList.remove("pressed");
+    }, 100);
+}
+
+////////// Initialize game on page load //////////
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
     const keyboard = document.getElementById("keyboard");
 
     keyboard.addEventListener("click", async (e) => {
         if (inputBlocked) return;
+        document.querySelectorAll(".key").forEach(btn => {
+            btn.addEventListener("click", () => {
+                pressKeyVisual(btn);
+            });
+        });
 
         const key = e.target.closest(".key");
         if (!key) return;
