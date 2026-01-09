@@ -23,7 +23,9 @@ async function startNewGame() {
 
         // Reset your board UI here
         resetBoard();
+        resetKeyboard();
         inputBlocked = false; // unblock input
+
     } catch (error) {
         console.error('Error starting game:', error);
     }
@@ -75,8 +77,19 @@ function resetBoard() {
     }
 }
 
+function resetKeyboard() {
+    const keys = document.querySelectorAll("#keyboard .key");
+    const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--key-bg').trim();
+
+    keys.forEach(key => {
+        key.classList.remove('correct', 'present', 'absent');
+        key.style.backgroundColor = ''; // Reset to default
+    });
+}
+
+
 // Update board with result
-function updateBoard(result) {
+function updateBoard(result, guess) {
     const board = document.getElementById("board");
     const row = board.querySelectorAll(".row")[currentRow];
 
@@ -99,6 +112,9 @@ function updateBoard(result) {
             setTimeout(() => tile.style.transform = 'scale(1)', 150);
         }, i * 150); // Staggered delay for flip effect
     }
+    console.log(result)
+    // Update keyboard
+    updateKeyboard(result, guess); 
 
     // Check if won
     setTimeout(() => {
@@ -106,6 +122,32 @@ function updateBoard(result) {
         else if (currentRow >= ROWS) showGameOver("You lost! Better luck next time.");
     }, 5000);
 }
+
+function updateKeyboard(result, guess) {
+    const keys = document.querySelectorAll("#keyboard .key");
+    guess = guess.toUpperCase();
+
+    for (let i = 0; i < guess.length; i++) {
+        const letter = guess[i];
+        const key = Array.from(keys).find(k => k.textContent.toUpperCase() === letter);
+        if (!key) continue;
+
+        if (result[i] === '2') {
+            key.classList.remove('present', 'absent');
+            key.classList.add('correct');
+        } else if (result[i] === '1') {
+            if (!key.classList.contains('correct')) {
+                key.classList.remove('absent');
+                key.classList.add('present');
+            }
+        } else { // '0'
+            if (!key.classList.contains('correct') && !key.classList.contains('present')) {
+                key.classList.add('absent');
+            }
+        }
+    }
+}
+
 
 ////////// Modal windows //////////
 function setupModal(modalId, triggerId) {
@@ -229,7 +271,7 @@ async function handleEnter() {
         return; // invalid word
     }
 
-    updateBoard(response);
+    updateBoard(response, word); 
 
     currentRow++;
     currentCol = 0;

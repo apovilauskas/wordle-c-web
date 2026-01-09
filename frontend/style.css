@@ -171,6 +171,21 @@ header .title {
     background-color: var(--key-pressed);
 }
 
+.key.correct {
+    background-color: var(--correct);
+    color: var(--text);
+}
+
+.key.present {
+    background-color: var(--present);
+    color: var(--text);
+}
+
+.key.absent {
+    background-color: var(--absent);
+    color: var(--text);
+}
+
 #backspace {
     /* icon "Backspace" by FortAwesome, licensed under CC Attribution License --> */
     background-image: url('icons/backspace-svgrepo-com.svg');
