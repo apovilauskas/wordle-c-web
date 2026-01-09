@@ -58,7 +58,7 @@ function resetBoard() {
     const rows = board.querySelectorAll(".row");
 
     rows.forEach((row, rowIndex) => {
-        row.classList.remove("active");
+        row.classList.remove("active", "won");
 
         const tiles = row.querySelectorAll(".tile");
         tiles.forEach(tile => {
@@ -117,10 +117,21 @@ function updateBoard(result, guess) {
     updateKeyboard(result, guess); 
 
     // Check if won
-    setTimeout(() => {
-        if (result === '22222') showGameOver("You won!");
-        else if (currentRow >= ROWS) showGameOver("You lost! Better luck next time.");
-    }, 5000);
+        if (result === '22222') {
+            inputBlocked = true; // block further input
+
+            const board = document.getElementById("board");
+            const row = board.querySelectorAll(".row")[currentRow];
+            row.classList.add('won'); // Add a special class for winning row
+            setTimeout(() => {                    
+                    showGameOver("You won!");
+            }, 4000);
+                
+            return;
+        } else if (currentRow >= ROWS) {
+            inputBlocked = true; // block further input
+            showGameOver("You lost! Better luck next time.");
+        }
 }
 
 function updateKeyboard(result, guess) {
@@ -140,7 +151,7 @@ function updateKeyboard(result, guess) {
                 key.classList.remove('absent');
                 key.classList.add('present');
             }
-        } else { // '0'
+        } else { // result[i] === '0'
             if (!key.classList.contains('correct') && !key.classList.contains('present')) {
                 key.classList.add('absent');
             }
@@ -254,11 +265,10 @@ function removeLetter() {
 async function handleEnter() {
     if (inputBlocked) return;
 
-    inputBlocked = true;
+
 
     if (currentCol < COLS) {
         shakeRow();
-        inputBlocked = false;
         return; // not enough letters
     }
 
@@ -267,7 +277,6 @@ async function handleEnter() {
 
     if (response.error) {
         shakeRow();
-        inputBlocked = false;
         return; // invalid word
     }
 
@@ -275,7 +284,6 @@ async function handleEnter() {
 
     currentRow++;
     currentCol = 0;
-    inputBlocked = false;
 }
 
 ////////// Animations //////////
