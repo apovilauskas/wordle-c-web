@@ -146,6 +146,24 @@ document.getElementById("new-game-btn").addEventListener("click", async () => {
     await startNewGame();
 });
 
+////////// Dark Mode Toggle //////////
+const darkToggle = document.getElementById("dark-toggle");
+
+darkToggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark", darkToggle.checked);
+    localStorage.setItem("theme", darkToggle.checked ? "dark" : "light");
+});
+
+// Load saved theme on page load
+document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+        document.body.classList.add("dark");
+        darkToggle.checked = true;
+    }
+});
+
+
 ////////// Game Logic //////////
 function getCurrentWord() {
     const board = document.getElementById("board");
@@ -293,4 +311,3 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
 });
-

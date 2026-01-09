@@ -1,15 +1,59 @@
 /* Set global font, background color, and remove default margins */
+:root {
+    --bg: #f5f5f5;
+    --text: #000000;
+
+    --tile-border: #d3d6da;
+
+    --tile-bg: #ffffff;
+    --key-bg: #dfdfdf;
+    --key-pressed: #cfcfcf;
+
+    --correct: #6aaf64;
+    --present: #cdcd59;
+    --absent: #a3a3a3;
+
+    --modal-bg: #ffffff;
+    --overlay: rgba(0,0,0,0.5);
+}
+
+body.dark {
+    --bg: #121213;
+    --text: #ffffff;
+
+    --tile-border: #3a3a3c;
+    --tile-bg: #121213;
+
+    --key-bg: #818384;
+    --key-pressed: #565758;
+
+    --correct: #538d4e;
+    --present: #b59f3b;
+    --absent: #3a3a3c;
+
+    --modal-bg: #1a1a1b;
+    --overlay: rgba(0,0,0,0.8);
+}
+body.dark .icon img {
+    filter: invert(1);
+}
+body.dark #backspace {
+    filter: invert(1);
+}
+
 body {
-    font-family: "Inter", sans-serif; /* main font */
-    background-color: #f5f5f5; /* light background */
+    font-family: "Inter", sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
     margin: 0;
     padding: 0;
-    display: flex;             /* use flexbox for layout */
-    flex-direction: column;    /* header on top, board below */
-    justify-content: center;   /* center */
-    align-items: center;       
-    min-height: 100vh;         /* full viewport height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
+
 
 /* Header styles */
 header {
@@ -66,34 +110,26 @@ header .title {
     height: 50%;
 }
 
-.tile{
+.tile {
     flex: 1;
-    aspect-ratio: 1 / 1;    /* Tile will stay square shaped */
-    min-width: 25px;  
-    min-height: 25px;  
-    border: 2px solid #d3d6da;
+    aspect-ratio: 1 / 1;
+    min-width: 25px;
+    min-height: 25px;
+    border: 2px solid var(--tile-border);
+    background-color: var(--tile-bg);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    font-size: clamp(25px, 4vh, 32px);  /* Text will adjust to the tile size */
+    font-size: clamp(25px, 4vh, 32px);
     font-weight: 700;
     text-transform: uppercase;
-
-    box-sizing: border-box;
 }
 
-
-.correct{
-    background-color: #6aaf64;
-}
-.present{
-    background-color: #cdcd59;
-}
-.absent{
-    background-color: #a3a3a3;
-}
+.correct { background-color: var(--correct); }
+.present { background-color: var(--present); }
+.absent  { background-color: var(--absent); }
 
 /* Keyboard styles */
 #keyboard {
@@ -107,19 +143,17 @@ header .title {
 
 .key {
     height: 60px;
-    flex: 1;                  /* keys expand evenly */
+    flex: 1;
     margin: 0 4px;
-    background-color: #dfdfdf;
-    color: #000000;
+    background-color: var(--key-bg);
+    color: var(--text);
     border: none;
     border-radius: 2px;
     font-size: 18px;
     font-weight: 550;
     cursor: pointer;
 
-    user-select: none;     
-    -webkit-user-select: none;
-    -ms-user-select: none;
+    user-select: none;
     outline: none;
 }
 .key-large {
@@ -128,6 +162,12 @@ header .title {
 
 .spacer {
     flex: 0.5;                /* smaller space */
+}
+
+/* Key press animation */
+.key.pressed {
+    transform: scale(0.92);
+    background-color: var(--key-pressed);
 }
 
 #backspace {
@@ -146,7 +186,7 @@ header .title {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0,0,0,0.5);
+    background: var(--overlay);
     opacity: 1;
     transition: 0.3s;
 
@@ -161,7 +201,8 @@ header .title {
 }
 
 .modal-window {
-    background: white;
+    background: var(--modal-bg);
+    color: var(--text);
     padding: 20px;
     border-radius: 10px;
     max-width: 420px;
@@ -206,10 +247,4 @@ header .title {
 
 .shake {
   animation: shake 0.5s;
-}
-
-/* Key press animation */
-.key.pressed {
-    transform: scale(0.92);
-    background-color: #cfcfcf;
 }
