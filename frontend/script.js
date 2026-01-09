@@ -72,7 +72,7 @@ function updateBoard(result) {
             // Animation 
             tile.style.transition = 'transform 0.2s ease, background-color 0.5s ease';
             tile.style.transform = 'scale(1.2)';
-             setTimeout(() => tile.style.transform = 'scale(1)', 150);
+            setTimeout(() => tile.style.transform = 'scale(1)', 150);
         }, i * 150); // Staggered delay for flip effect
     }
 
@@ -106,7 +106,7 @@ function setupModal(modalId, triggerId) {
 // Initialize modals
 setupModal("tutorial-modal", "tutorial-btn");
 setupModal("settings-modal", "settings-btn");
-setupModal("game-over-modal"); 
+setupModal("game-over-modal");
 
 function showGameOver(won) {
     inputBlocked = true;
@@ -200,62 +200,83 @@ function shakeRow() {
     }, { once: true });
 }
 
+async function handleEnter() {
+    if (inputBlocked) return;
+
+    inputBlocked = true;
+
+    if (currentCol < COLS) {
+        shakeRow();
+        inputBlocked = false;
+        return;
+    }
+
+    const word = getCurrentWord();
+    const response = await submitGuess(word);
+
+    if (response.error) {
+        shakeRow();
+        inputBlocked = false;
+        return;
+    }
+
+    updateBoard(response);
+
+    currentRow++;
+    currentCol = 0;
+    inputBlocked = false;
+}
+
 // Initialize game on page load
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
+    const keyboard = document.getElementById("keyboard");
+
+    keyboard.addEventListener("click", async (e) => {
+        if (inputBlocked) return;
+
+        const key = e.target.closest(".key");
+        if (!key) return;
+
+        // BACKSPACE
+        if (key.id === "backspace") {
+            removeLetter();
+            return;
+        }
+
+        // ENTER
+        if (key.id === "enter") {
+            await handleEnter();
+            return;
+        }
+
+        // LETTER
+        const letter = key.textContent;
+        if (/^[A-Z]$/.test(letter)) {
+            addLetter(letter);
+        }
+    });
 
     document.addEventListener("keydown", async (e) => {
         if (inputBlocked) return; // ignore input if blocked
 
+        // BACKSPACE
         if (e.key === "Backspace") {
             removeLetter();
             return;
         }
 
+        // ENTER
         if (e.key === "Enter") {
-            console.log("Enter pressed");
-
-            inputBlocked = true; // block input during processing
-
-            if (currentCol < COLS) {
-                console.log("Not enough letters");
-                shakeRow();
-                setTimeout(() => {
-                    inputBlocked = false;
-                }, 200); // unblock input after shake animation
-                return;
-            }
-
-            const word = getCurrentWord();
-
-            const response = await submitGuess(word);
-
-            if (response.error) {
-                console.log("Error:", response.error);
-
-                shakeRow();
-                setTimeout(() => {
-                    inputBlocked = false;
-                }, 200); // unblock input after shake animation
-
-                return;
-            }
-
-            updateBoard(response);
-
-            currentRow++;
-            currentCol = 0;
-            inputBlocked = false; // unblock input after processing
-
+            await handleEnter();
             return;
         }
 
-        // letter input
+        // LETTER
         if (/^[a-zA-Z]$/.test(e.key)) {
             addLetter(e.key.toUpperCase());
         }
     })
-    // Your existing keyboard/input handling here
-    // When user presses Enter, call submitGuess(currentGuess)
+
 });
 
