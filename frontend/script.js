@@ -164,6 +164,7 @@ function getCurrentWord() {
 function addLetter(letter) {
     if (currentCol >= 5) {                  // if column limit reached
         console.log("Column limit reached!");
+        shakeRow();
         return;
     }
     const board = document.getElementById("board"); // search for the board element
@@ -195,7 +196,7 @@ async function handleEnter() {
     if (currentCol < COLS) {
         shakeRow();
         inputBlocked = false;
-        return;
+        return; // not enough letters
     }
 
     const word = getCurrentWord();
@@ -204,7 +205,7 @@ async function handleEnter() {
     if (response.error) {
         shakeRow();
         inputBlocked = false;
-        return;
+        return; // invalid word
     }
 
     updateBoard(response);
@@ -230,13 +231,6 @@ function shakeRow() {
     }, { once: true });
 }
 
-function pressKeyVisual(button) {
-    button.classList.add("pressed");
-    setTimeout(() => {
-        button.classList.remove("pressed");
-    }, 100);
-}
-
 ////////// Initialize game on page load //////////
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
@@ -246,7 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputBlocked) return;
         document.querySelectorAll(".key").forEach(btn => {
             btn.addEventListener("click", () => {
-                pressKeyVisual(btn);
+                btn.blur(); // remove focus outline
+
+                btn.classList.add("pressed");
+                setTimeout(() => {
+                    btn.classList.remove("pressed");
+                }, 100);
             });
         });
 
