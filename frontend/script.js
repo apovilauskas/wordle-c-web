@@ -7,6 +7,8 @@ const COLS = 5;
 let currentRow = 0;  // global variable for current row
 let currentCol = 0;  // global variable for current column
 
+let inputBlocked = false;
+
 // Start new game
 async function startNewGame() {
     try {
@@ -134,11 +136,28 @@ function removeLetter() {
   tile.textContent = " ";                   // clear the letter from the tile
 }
 
+function shakeRow() {
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+    const row = rows[currentRow]; // current row
+
+    if (!row) return;
+
+    row.classList.add("shake");
+
+    // Remove the class after animation ends
+    row.addEventListener("animationend", () => {
+        row.classList.remove("shake");
+    }, { once: true });
+}
+
 // Initialize game on page load
 document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
 
     document.addEventListener("keydown", async (e) => {
+        if (inputBlocked) return; // ignore input if blocked
+
         if (e.key === "Backspace") {
             removeLetter();
             return;
@@ -147,8 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === "Enter") {
             console.log("Enter pressed");
 
+            inputBlocked = true; // block input during processing
+
             if (currentCol < COLS) {
             console.log("Not enough letters");
+            shakeRow();                 
+            setTimeout(() => {
+                inputBlocked = false;
+            }, 200); // unblock input after shake animation
             return;
             }
 
@@ -158,14 +183,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.error) {
                 console.log("Error:", response.error);
-                //shakeRow();                  // опционально
-                return;                      // ❗ не переходим к следующей строке
+
+                shakeRow();                 
+                setTimeout(() => {
+                    inputBlocked = false;
+                }, 200); // unblock input after shake animation
+
+                return;                     
             }
 
             updateBoard(response);
 
             currentRow++;
             currentCol = 0;
+            inputBlocked = false; // unblock input after processing
 
             if (currentRow >= ROWS) {
                 console.log("Game over!");
