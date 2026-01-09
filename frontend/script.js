@@ -16,11 +16,11 @@ async function startNewGame() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         });
-        
+
         const data = await response.json();
         sessionId = data.sessionId;
         console.log('New game started:', sessionId);
-        
+
         // Reset your board UI here
         resetBoard();
     } catch (error) {
@@ -55,17 +55,28 @@ function updateBoard(result) {
     const board = document.getElementById("board");
     const row = board.querySelectorAll(".row")[currentRow];
 
+
     for (let i = 0; i < result.length; i++) {
         const tile = row.children[i];
-        if (result[i] === '2') {
-            tile.classList.add('correct'); // Green
-        } else if (result[i] === '1') {
-            tile.classList.add('present'); // Yellow
-        } else {
-            tile.classList.add('absent'); // Grey
-        }
+
+        setTimeout(() => {
+            if (result[i] === '2') {
+                tile.classList.add('correct'); // Green
+            } else if (result[i] === '1') {
+                tile.classList.add('present'); // Yellow
+            } else {
+                tile.classList.add('absent'); // Grey
+            }
+
+            // Animation 
+            tile.style.transition = 'transform 0.2s ease, background-color 0.5s ease';
+            tile.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                tile.style.transform = 'scale(1)';
+            }, 150);
+        }, i * 150); // Staggered delay for flip effect
     }
-    
+
     // Check if won
     if (result === '22222') {
         setTimeout(() => alert('You won!'), 500);
@@ -97,43 +108,43 @@ function resetBoard() {
 }
 
 function getCurrentWord() {
-  const board = document.getElementById("board");
-  const rows = board.querySelectorAll(".row");
-  const row = rows[currentRow]; // current row
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+    const row = rows[currentRow]; // current row
 
-  let word = "";
-  for (let i = 0; i < row.children.length; i++) {
-    const tile = row.children[i];
-    word += tile.textContent; // letters collection
-  }
+    let word = "";
+    for (let i = 0; i < row.children.length; i++) {
+        const tile = row.children[i];
+        word += tile.textContent; // letters collection
+    }
 
-  return word;
+    return word;
 }
 
 function addLetter(letter) {
-  if (currentCol >= 5) {                  // if column limit reached
-    console.log("Column limit reached!");
-    return;
-  }
-  const board = document.getElementById("board"); // search for the board element
-  const rows = board.querySelectorAll(".row");  // get all rows
-  const row = rows[currentRow];           // choose the current row
-  const tile = row.children[currentCol]; // choose the current tile
+    if (currentCol >= 5) {                  // if column limit reached
+        console.log("Column limit reached!");
+        return;
+    }
+    const board = document.getElementById("board"); // search for the board element
+    const rows = board.querySelectorAll(".row");  // get all rows
+    const row = rows[currentRow];           // choose the current row
+    const tile = row.children[currentCol]; // choose the current tile
 
-  tile.textContent = letter;              // enter the letter into the tile
-  ++currentCol;                           // move to the next column
+    tile.textContent = letter;              // enter the letter into the tile
+    ++currentCol;                           // move to the next column
 }
 
 function removeLetter() {
-  if (currentCol === 0) return;           // if at the beginning of the row, do nothing
+    if (currentCol === 0) return;           // if at the beginning of the row, do nothing
 
-  --currentCol;                            // return to the previous column
-  const board = document.getElementById("board");
-  const rows = board.querySelectorAll(".row");
-  const row = rows[currentRow];
-  const tile = row.children[currentCol];
+    --currentCol;                            // return to the previous column
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+    const row = rows[currentRow];
+    const tile = row.children[currentCol];
 
-  tile.textContent = " ";                   // clear the letter from the tile
+    tile.textContent = " ";                   // clear the letter from the tile
 }
 
 function shakeRow() {
@@ -169,12 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
             inputBlocked = true; // block input during processing
 
             if (currentCol < COLS) {
-            console.log("Not enough letters");
-            shakeRow();                 
-            setTimeout(() => {
-                inputBlocked = false;
-            }, 200); // unblock input after shake animation
-            return;
+                console.log("Not enough letters");
+                shakeRow();
+                setTimeout(() => {
+                    inputBlocked = false;
+                }, 200); // unblock input after shake animation
+                return;
             }
 
             const word = getCurrentWord();
@@ -184,12 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.error) {
                 console.log("Error:", response.error);
 
-                shakeRow();                 
+                shakeRow();
                 setTimeout(() => {
                     inputBlocked = false;
                 }, 200); // unblock input after shake animation
 
-                return;                     
+                return;
             }
 
             updateBoard(response);
@@ -209,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (/^[a-zA-Z]$/.test(e.key)) {
             addLetter(e.key.toUpperCase());
         }
-    }) 
+    })
     // Your existing keyboard/input handling here
     // When user presses Enter, call submitGuess(currentGuess)
 });
