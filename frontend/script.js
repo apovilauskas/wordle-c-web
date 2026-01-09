@@ -23,6 +23,7 @@ async function startNewGame() {
 
         // Reset your board UI here
         resetBoard();
+        inputBlocked = false; // unblock input
     } catch (error) {
         console.error('Error starting game:', error);
     }
@@ -71,17 +72,54 @@ function updateBoard(result) {
             // Animation 
             tile.style.transition = 'transform 0.2s ease, background-color 0.5s ease';
             tile.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                tile.style.transform = 'scale(1)';
-            }, 150);
+             setTimeout(() => tile.style.transform = 'scale(1)', 150);
         }, i * 150); // Staggered delay for flip effect
     }
 
     // Check if won
-    if (result === '22222') {
-        setTimeout(() => alert('You won!'), 500);
+    setTimeout(() => {
+        if (result === '22222') showGameOver(true);
+        else if (currentRow >= ROWS) showGameOver(false);
+    }, result.length * 150 + 200);
+}
+
+function setupModal(modalId, triggerId) {
+    const modal = document.getElementById(modalId);
+    const trigger = document.getElementById(triggerId);
+
+    // Open modal
+    if (trigger) {
+        trigger.addEventListener("click", () => {
+            modal.classList.remove("hidden");
+        });
+    }
+
+    // Close modal
+    const closeBtn = modal.querySelector(".close");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            modal.classList.add("hidden");
+        });
     }
 }
+
+// Initialize modals
+setupModal("tutorial-modal", "tutorial-btn");
+setupModal("settings-modal", "settings-btn");
+setupModal("game-over-modal"); 
+
+function showGameOver(won) {
+    inputBlocked = true;
+    const modal = document.getElementById("game-over-modal");
+    const message = document.getElementById("game-over-message");
+    message.textContent = won ? "You won!" : "You lost! Better luck next time.";
+    modal.classList.remove("hidden"); // Show modal
+}
+// Button to start a new game
+document.getElementById("new-game-btn").addEventListener("click", async () => {
+    document.getElementById("game-over-modal").classList.add("hidden");
+    await startNewGame();
+});
 
 function resetBoard() {
     const board = document.getElementById("board");
@@ -144,7 +182,7 @@ function removeLetter() {
     const row = rows[currentRow];
     const tile = row.children[currentCol];
 
-    tile.textContent = " ";                   // clear the letter from the tile
+    tile.textContent = "";                   // clear the letter from the tile
 }
 
 function shakeRow() {
@@ -208,10 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRow++;
             currentCol = 0;
             inputBlocked = false; // unblock input after processing
-
-            if (currentRow >= ROWS) {
-                console.log("Game over!");
-            }
 
             return;
         }
