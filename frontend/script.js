@@ -28,7 +28,7 @@ async function startNewGame() {
 
 // Submit guess
 async function submitGuess(guess) {
-    if (!sessionId) throw new Error("Game not started");
+    if (!sessionId) return { error: "Game not started" };
 
     const response = await fetch(`${API_URL}/guess`, {
         method: "POST",
@@ -42,7 +42,7 @@ async function submitGuess(guess) {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.error || "Invalid guess");
+        return { error: data.error || "Word not found" };
     }
 
     return data.result;
@@ -154,19 +154,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const word = getCurrentWord();
 
-            try {
-            const result = await submitGuess(word);
-            console.log(result);
-            updateBoard(result);
+            const response = await submitGuess(word);
 
-            ++currentRow;     // next row
-            currentCol = 0;   // reset column
+            if (response.error) {
+                console.log("Error:", response.error);
+                //shakeRow();                  // опционально
+                return;                      // ❗ не переходим к следующей строке
+            }
+
+            updateBoard(response);
+
+            currentRow++;
+            currentCol = 0;
 
             if (currentRow >= ROWS) {
                 console.log("Game over!");
-            }
-            } catch (err) {
-            console.error("Error in sending word", err);
             }
 
             return;
