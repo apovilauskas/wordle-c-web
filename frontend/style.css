@@ -250,6 +250,27 @@ header .title {
     height: 18px;
 }
 
+#new-game-btn {
+    margin-top: 20px;
+    padding: 12px 28px;
+
+    border: none;
+    border-radius: 2px;
+    font-size: 18px;
+    font-weight: 550;
+
+    background-color: var(--key-bg);
+    color: var(--text);
+
+    cursor: pointer;
+    outline: none;
+}
+
+/* Click */
+#new-game-btn:active {
+    transform: scale(0.92);
+    background-color: var(--key-pressed);
+}
 
 /* Animations */
 

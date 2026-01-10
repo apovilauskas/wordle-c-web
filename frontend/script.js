@@ -57,7 +57,7 @@ function resetBoard() {
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
 
-    rows.forEach((row, rowIndex) => {
+    rows.forEach((row) => {
         row.classList.remove("active", "won");
 
         const tiles = row.querySelectorAll(".tile");
@@ -79,7 +79,6 @@ function resetBoard() {
 
 function resetKeyboard() {
     const keys = document.querySelectorAll("#keyboard .key");
-    const defaultColor = getComputedStyle(document.documentElement).getPropertyValue('--key-bg').trim();
 
     keys.forEach(key => {
         key.classList.remove('correct', 'present', 'absent');
@@ -113,6 +112,7 @@ function updateBoard(result, guess) {
         }, i * 150); // Staggered delay for flip effect
     }
     console.log(result)
+
     // Update keyboard
     updateKeyboard(result, guess); 
 
@@ -125,12 +125,14 @@ function updateBoard(result, guess) {
             row.classList.add('won'); // Add a special class for winning row
             setTimeout(() => {                    
                     showGameOver("You won!");
-            }, 4000);
-                
+            }, 3000);
+              
             return;
-        } else if (currentRow >= ROWS) {
+        } else if (currentRow >= ROWS - 1) {
             inputBlocked = true; // block further input
-            showGameOver("You lost! Better luck next time.");
+            setTimeout(() => {   
+                showGameOver("You lost! Better luck next time.");
+            }, 2000);
         }
 }
 
@@ -187,7 +189,6 @@ const gameOverMessage = document.getElementById("game-over-message");
 const newGameBtn = document.getElementById("new-game-btn");
 
 function showGameOver(msg) {
-    inputBlocked = true;
     gameOverMessage.textContent = msg;
     gameOverModal.classList.remove("hidden");
 }
