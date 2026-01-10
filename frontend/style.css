@@ -15,6 +15,9 @@
 
     --modal-bg: #ffffff;
     --overlay: #00000080;
+
+    --close-color: #000000;
+    --close-hover: #555555;
 }
 
 body.dark {
@@ -33,6 +36,9 @@ body.dark {
 
     --modal-bg: #1a1a1b;
     --overlay: #000000cc;
+
+    --close-color: #ffffff;
+    --close-hover: #bbbbbb;
 }
 body.dark .icon img {
     filter: invert(1);
@@ -230,9 +236,14 @@ header .title {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 24px;
+
     background: none;
     border: none;
+    color: var(--close-color);
+
+    font-size: 26px;
+    font-weight: 600;
+
     cursor: pointer;
 }
 
