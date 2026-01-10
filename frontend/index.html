@@ -1,161 +1,179 @@
 <!DOCTYPE html>
 <html lang="eng">
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="style.css">
-        <title>Wordle</title>
-    </head>
-    <body>
-        <header>
-            <!-- Tutorial message button -->
-            <a href="#tutorial" class="icon">
-                <!-- Icon "Question Filled " by Siemens, licensed under MIT License -->
-                <img src="icons/question-filled-svgrepo-com.svg" alt="Help" width="24" height="24">
-            </a>
-                <!-- Tutorial modal message -->
-                <div id="tutorial" class="modal">
-                    <div class="modal-window">
-                        <a href="#" class="close">x</a>
-                        <h2>How to play</h2>
-                        <p>Guess the word in 6 tries!</p>
-                        <p>Each guess must be a valid 5-letter word.</p>
-                        <p>After each submition tiles will change color to show how close you are.</p>
 
-                        <h3>Examples</h3>
-                            <div class="row adjustable">
-                                <div class="tile correct">H</div>
-                                <div class="tile">E</div>
-                                <div class="tile">L</div>
-                                <div class="tile">L</div>
-                                <div class="tile">O</div>
-                            </div>
-                            <p>The letter H is in the word and in the correct spot.</p>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title>Wordle</title>
+</head>
 
-                            <div class="row adjustable">
-                                <div class="tile">T</div>
-                                <div class="tile">A</div>
-                                <div class="tile present">B</div>
-                                <div class="tile">L</div>
-                                <div class="tile">E</div>
-                            </div>
-                            <p>The letter B is in the word but in the wrong spot.</p>
+<body>
+    <header>
+        <!-- Tutorial message button -->
+        <button id="tutorial-btn" class="icon">
+            <!-- Icon "Question Filled " by Siemens, licensed under MIT License -->
+            <img src="icons/question-filled-svgrepo-com.svg" alt="Help" width="24" height="24">
+        </button>
+        <!-- Tutorial modal message -->
+        <div id="tutorial-modal" class="js-modal hidden">
+            <div class="modal-window">
+                <button class="close">&times;</button>
+                <h2>How to play</h2>
+                <p>Guess the word in 6 tries!</p>
+                <p>Each guess must be a valid 5-letter word.</p>
 
-                            <div class="row adjustable">
-                                <div class="tile">G</div>
-                                <div class="tile absent">R</div>
-                                <div class="tile">O</div>
-                                <div class="tile">U</div>
-                                <div class="tile">P</div>
-                            </div>
-                            <p>The letter R is not in the word in any spot.</p>
-                    </div>
+                <p>After each submission tiles will change color to show how close you are.</p>
+
+                <h3>Examples</h3>
+                <div class="row adjustable">
+                    <div class="tile correct">H</div>
+                    <div class="tile">E</div>
+                    <div class="tile">L</div>
+                    <div class="tile">L</div>
+                    <div class="tile">O</div>
                 </div>
+                <p>The letter H is in the word and in the correct spot.</p>
 
-            <!-- Title -->
-            <div class="title">WORDLE</div>
-            
-            <!-- Settings -->
-            <a href="#settings" class="icon">
-                <!-- Icon "settings" by iconhub, licensed under CC Attribution License -->
-                <img src="icons/settings-svgrepo-com.svg" alt="Settings" width="24" height="24"> 
-            </a>
-                <!-- Settings modal message -->
-                <div id="settings" class="modal">
-                    <div class="modal-window">
-                        <a href="#" class="close">x</a>
-                        <h2>Settings</h2>
-
-                        <!-- Dark-toggle --> 
-                        <div class="setting-row">
-                            <label for="dark-toggle">Dark Theme</label>
-                            <input type="checkbox" id="dark-toggle">
-                        </div>
-                    </div>
+                <div class="row adjustable">
+                    <div class="tile">T</div>
+                    <div class="tile">A</div>
+                    <div class="tile present">B</div>
+                    <div class="tile">L</div>
+                    <div class="tile">E</div>
                 </div>
-        </header>
+                <p>The letter B is in the word but in the wrong spot.</p>
 
-        <div id="board">
-            <div data-label="Row 1" class="row">
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-            </div>
-            <div data-label="Row 2" class="row">
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-            </div>
-            <div data-label="Row 3" class="row">
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-            </div>
-            <div data-label="Row 4" class="row">
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-            </div>
-            <div data-label="Row 5" class="row">
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-            </div>
-            <div data-label="Row 6" class="row">
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
+                <div class="row adjustable">
+                    <div class="tile">G</div>
+                    <div class="tile absent">R</div>
+                    <div class="tile">O</div>
+                    <div class="tile">U</div>
+                    <div class="tile">P</div>
+                </div>
+                <p>The letter R is not in the word in any spot.</p>
             </div>
         </div>
 
-        <div id="keyboard">
-            <div data-label="Keyboard row 1" class="row">
-                <button class="key">Q</button>
-                <button class="key">W</button>
-                <button class="key">E</button>
-                <button class="key">R</button>
-                <button class="key">T</button>
-                <button class="key">Y</button>
-                <button class="key">U</button>
-                <button class="key">I</button>
-                <button class="key">O</button>
-                <button class="key">P</button>
-            </div>
-            <div data-label="Keyboard row 2" class="row">
-                <div class="spacer"></div>
-                <button class="key">A</button>
-                <button class="key">S</button>
-                <button class="key">D</button>
-                <button class="key">F</button>
-                <button class="key">G</button>
-                <button class="key">H</button>
-                <button class="key">J</button>
-                <button class="key">K</button>
-                <button class="key">L</button>
-                <div class="spacer"></div>
-            </div>
-            <div data-label="Keyboard row 3" class="row">
-                <button class="key large" id="enter">ENTER</button>
-                <button class="key">Z</button>
-                <button class="key">X</button>
-                <button class="key">C</button>
-                <button class="key">V</button>
-                <button class="key">B</button>
-                <button class="key">N</button>
-                <button class="key">M</button>
-                <button class="key large" id="backspace"></button>
+        <!-- Title -->
+        <div class="title">WORDLE</div>
+
+        <!-- Settings -->
+        <button id="settings-btn" class="icon">
+            <!-- Icon "settings" by iconhub, licensed under CC Attribution License -->
+            <img src="icons/settings-svgrepo-com.svg" alt="Settings" width="24" height="24">
+        </button>
+        <!-- Settings modal message -->
+        <div id="settings-modal" class="js-modal hidden">
+            <div class="modal-window">
+                <button class="close">&times;</button>
+
+                <h2>Settings</h2>
+
+                <!-- Dark-toggle -->
+                <div class="setting-row">
+                    <label for="dark-toggle">Dark Theme</label>
+                    <input type="checkbox" id="dark-toggle">
+                </div>
             </div>
         </div>
-    </body>
+    </header>
+
+    <div id="board">
+        <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+        <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+        <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+        <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+        <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+        <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+        </div>
+    </div>
+
+    <div id="keyboard">
+        <div data-label="Keyboard row 1" class="row">
+            <button class="key">Q</button>
+            <button class="key">W</button>
+            <button class="key">E</button>
+            <button class="key">R</button>
+            <button class="key">T</button>
+            <button class="key">Y</button>
+            <button class="key">U</button>
+            <button class="key">I</button>
+            <button class="key">O</button>
+            <button class="key">P</button>
+        </div>
+        <div data-label="Keyboard row 2" class="row">
+            <div class="spacer"></div>
+            <button class="key">A</button>
+            <button class="key">S</button>
+            <button class="key">D</button>
+            <button class="key">F</button>
+            <button class="key">G</button>
+            <button class="key">H</button>
+            <button class="key">J</button>
+            <button class="key">K</button>
+            <button class="key">L</button>
+            <div class="spacer"></div>
+        </div>
+        <div data-label="Keyboard row 3" class="row">
+            <button class="key large" id="enter">ENTER</button>
+            <button class="key">Z</button>
+            <button class="key">X</button>
+            <button class="key">C</button>
+            <button class="key">V</button>
+            <button class="key">B</button>
+            <button class="key">N</button>
+            <button class="key">M</button>
+            <button class="key large" id="backspace"></button>
+        </div>
+    </div>
+
+    <!-- Game over modal message -->
+    <div id="game-over-modal" class="js-modal hidden">
+        <div class="modal-window">
+            <button class="close">&times;</button>
+            <div align="center">
+                <h2 id="game-over-message">You lost!</h2>
+                <button id="new-game-btn">Start New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
 </html>
