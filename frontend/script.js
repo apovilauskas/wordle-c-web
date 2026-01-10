@@ -156,6 +156,8 @@ function updateKeyboard(result, guess) {
                 key.classList.add('absent');
             }
         }
+            // Animation 
+            key.style.transition = 'transform 0.5s ease, background-color 0.5s ease';
     }
 }
 
