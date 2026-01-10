@@ -124,7 +124,7 @@ function updateBoard(result, guess) {
             const row = board.querySelectorAll(".row")[currentRow];
             row.classList.add('won'); // Add a special class for winning row
             setTimeout(() => {                    
-                    showGameOver("You won!");
+                    showGameOver("You won! Congratulations!");
             }, 3000);
               
             return;
