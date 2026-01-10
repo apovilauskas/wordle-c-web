@@ -1,26 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <unistd.h>        // Replaces winsock specific logic
+#include <sys/socket.h>    // Linux socket headers
+#include <netinet/in.h>    // Linux address headers
 #include "http_handler.h"
 #include "game_state.h"
 
 #define PORT 8080
 
 int main() {
-    WSADATA wsaData;
-    int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     int server_fd, new_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
+    int opt = 1;
     
     // Initialize game state
     init_game_states();
     
-    // Create socket
+    // Create socket file descriptor
+    // AF_INET = IPv4, SOCK_STREAM = TCP
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+    
+    // Forcefully attach socket to the port 8080 (helps with restarts)
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+        perror("setsockopt");
         exit(EXIT_FAILURE);
     }
     
@@ -52,11 +59,10 @@ int main() {
         
         // Handle the request
         handle_http_request(new_socket);
-        shutdown(new_socket, SD_BOTH);
-        closesocket(new_socket);
+        
+        // Close the socket (Linux uses close, not closesocket)
+        close(new_socket);
     }
-
-    WSACleanup();
     
     return 0;
 }

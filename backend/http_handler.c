@@ -2,79 +2,82 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <winsock2.h>
 #include <ctype.h>
-#include <ws2tcpip.h>
+#include <sys/socket.h> // Linux sockets
 #include "http_handler.h"
 #include "game_state.h"
 #include "logic.h"
 #include "words.h"
+
 #define BUFFER_SIZE 32768
-// Forward declarations
-void handle_new_game(int socket);
-void handle_guess(int socket, char* request);
 
-
-
-void send_cors_headers(int socket) {
-    char* cors = "Access-Control-Allow-Origin: *\r\n"
-                 "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
-                 "Access-Control-Allow-Headers: Content-Type\r\n";
-    send(socket, cors, strlen(cors), 0);
-}
-
-void send_response(int socket, int status_code, const char* content_type, const char* body) {
-    char header[1024];
+// Helper to serve actual files (index.html, style.css, etc.)
+void serve_file(int socket, const char* path, const char* content_type) {
+    char full_path[512];
+    // This looks into the frontend folder relative to where the server runs
+    snprintf(full_path, sizeof(full_path), "../frontend%s", path);
     
-    // 1. Build only the header
-    int header_len = snprintf(header, sizeof(header),
-         "HTTP/1.1 %d OK\r\n"
-         "Content-Type: %s\r\n"
-         "Content-Length: %zu\r\n"
-         "Access-Control-Allow-Origin: *\r\n" // Put CORS here directly
-         "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
-         "Access-Control-Allow-Headers: Content-Type\r\n"
-         "\r\n", 
-         status_code, content_type, strlen(body));
+    FILE* f = fopen(full_path, "rb");
+    if (!f) {
+        // If file not found in frontend, try root (for index.html at /)
+        if (strcmp(path, "/") == 0) {
+            f = fopen("../frontend/index.html", "rb");
+        }
+    }
 
-    // 2. Send the header
-    send(socket, header, header_len, 0);
-    
-    // 3. Send the body once
-    send(socket, body, strlen(body), 0);
+    if (f) {
+        fseek(f, 0, SEEK_END);
+        long fsize = ftell(f);
+        fseek(f, 0, SEEK_SET);
+
+        char* content = malloc(fsize + 1);
+        fread(content, fsize, 1, f);
+        fclose(f);
+        content[fsize] = 0;
+
+        send_response(socket, 200, content_type, content);
+        free(content);
+    } else {
+        send_response(socket, 404, "text/plain", "File Not Found");
+    }
 }
 
 void handle_http_request(int socket) {
     char buffer[BUFFER_SIZE] = {0};
-    recv(socket, buffer, BUFFER_SIZE, 0);
+    int bytes_received = recv(socket, buffer, BUFFER_SIZE, 0);
+    if (bytes_received <= 0) return;
     
-    // Parse request line
     char method[16], path[256], version[16];
     sscanf(buffer, "%s %s %s", method, path, version);
     
-    printf("Request: %s %s\n", method, path);
-    
-    // Handle OPTIONS (CORS preflight)
-    if (strcmp(method, "OPTIONS") == 0) {
-        char* response = "HTTP/1.1 204 No Content\r\n";
-        send(socket, response, strlen(response), 0);
-        send_cors_headers(socket);
-        send(socket, "\r\n", 2, 0);
-        return;
-    }
-    
-    // Route requests
+    // 1. Route API Calls
     if (strcmp(method, "POST") == 0 && strcmp(path, "/api/new-game") == 0) {
         handle_new_game(socket);
     } 
     else if (strcmp(method, "POST") == 0 && strcmp(path, "/api/guess") == 0) {
         handle_guess(socket, buffer);
-    }else if (strcmp(method, "GET") == 0 && strcmp(path, "/") == 0) {
-        send_response(socket, 200, "text/html", "<h1>Wordle API is Running</h1>");
-        return;
-    } else {
-        char* error = "{\"error\":\"Not found\"}";
-        send_response(socket, 404, "application/json", error);
+    }
+    // 2. Handle CORS Preflight
+    else if (strcmp(method, "OPTIONS") == 0) {
+        char* response = "HTTP/1.1 204 No Content\r\n"
+                         "Access-Control-Allow-Origin: *\r\n"
+                         "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+                         "Access-Control-Allow-Headers: Content-Type\r\n"
+                         "\r\n";
+        send(socket, response, strlen(response), 0);
+    }
+    // 3. Serve Static Frontend Files
+    else if (strcmp(path, "/") == 0 || strcmp(path, "/index.html") == 0) {
+        serve_file(socket, "/index.html", "text/html");
+    } 
+    else if (strstr(path, ".css")) {
+        serve_file(socket, path, "text/css");
+    } 
+    else if (strstr(path, ".js")) {
+        serve_file(socket, path, "application/javascript");
+    }
+    else {
+        send_response(socket, 404, "application/json", "{\"error\":\"Not found\"}");
     }
 }
 

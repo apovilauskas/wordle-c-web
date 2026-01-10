@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
-LDFLAGS = -lws2_32 
+# Removed -lws2_32 because it is for Windows only
+LDFLAGS = 
 
 TARGET = wordle_server
 SOURCES = server.c http_handler.c game_state.c logic.c words.c

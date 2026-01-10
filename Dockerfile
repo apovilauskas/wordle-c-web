@@ -1,18 +1,17 @@
-# 1. Use an image that has GCC (C compiler) pre-installed
 FROM gcc:latest
 
-# 2. Create a folder for your app inside the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# 3. Copy all your project files (backend, frontend, etc.) into the container
+# Copy everything
 COPY . .
 
-# 4. Compile the C code
-# We tell GCC to take the server.c file and output a program called "server"
-RUN gcc backend/server.c -o server
+# Compile
+WORKDIR /app/backend
+RUN make
 
-# 5. Allow traffic on port 8080 (Matches your C code)
+# Expose the port
 EXPOSE 8080
 
-# 6. Run the compiled server
-CMD ["./server"]
+# Run from the backend folder so it can find words.txt locally
+# but can find ../frontend/ files
+CMD ["./wordle_server"]

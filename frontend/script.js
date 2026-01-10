@@ -1,5 +1,7 @@
-const API_URL = 'http://localhost:8080/api'; // Change for production
-let sessionId = null;
+// Automatically use the correct URL based on where the site is running
+const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8080/api' 
+    : '/api';
 
 const ROWS = 6;
 const COLS = 5;
