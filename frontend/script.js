@@ -167,15 +167,22 @@ function updateKeyboard(result, guess) {
 ////////// Modal windows //////////
 function setupModal(modalId, triggerId) {
     const modal = document.getElementById(modalId);
+    const trigger = triggerId && document.getElementById(triggerId);
 
-    // Open modal if trigger exists
-    if (triggerId) {
-        const trigger = document.getElementById(triggerId);
-        trigger?.addEventListener("click", () => modal.classList.remove("hidden"));
-    }
+    // Open
+    trigger?.addEventListener("click", () =>
+        modal.classList.remove("hidden")
+    );
 
-    // Close modal
-    modal.querySelector(".close")?.addEventListener("click", () => modal.classList.add("hidden"));
+    // Close by X
+    modal.querySelector(".close")?.addEventListener("click", () =>
+        modal.classList.add("hidden")
+    );
+
+    // Close by overlay click
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.add("hidden");
+    });
 }
 
 // Initialize modals
