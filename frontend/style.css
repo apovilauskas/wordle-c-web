@@ -194,7 +194,7 @@ header .title {
 
 #backspace {
     /* icon "Backspace" by FortAwesome, licensed under CC Attribution License --> */
-    background-image: url('icons/backspace-svgrepo-com.svg');
+    background-image: url('/icons/backspace-svgrepo-com.svg');
     background-size: 60%;
     background-repeat: no-repeat;
     background-position: center;
