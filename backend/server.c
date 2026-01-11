@@ -28,7 +28,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     int port = 8080;
     char *env_port = getenv("PORT");
