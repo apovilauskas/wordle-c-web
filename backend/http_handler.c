@@ -164,3 +164,24 @@ void handle_guess(int socket, char* request) {
     free(result);
     free(json_result);
 }
+
+void send_response(int socket, int status_code, const char* content_type, const char* body) {
+    char header[4096];
+    int body_len = body ? strlen(body) : 0;
+
+    snprintf(header, sizeof(header),
+        "HTTP/1.1 %d OK\r\n"
+        "Content-Type: %s\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+        "Access-Control-Allow-Headers: Content-Type\r\n"
+        "Content-Length: %d\r\n"
+        "\r\n",
+        status_code, content_type, body_len
+    );
+
+    send(socket, header, strlen(header), 0);
+    if (body_len > 0) {
+        send(socket, body, body_len, 0);
+    }
+}

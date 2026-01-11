@@ -16,9 +16,9 @@ int cmp(const void *a, const void *b) {
 void loadDictionary(const char *filepath) {
     printf("DEBUG: Loading dictionary from %s...\n", filepath);
     
-    FILE *file = fopen("words.txt", "r"); // Explicitly looking for words.txt
+    FILE *file = fopen(filepath, "r"); // Explicitly looking for words.txt
     if (!file) {
-        printf("ERROR: Could not open words.txt! Make sure it is in the same folder as the .exe\n");
+        printf("ERROR: Could not open dictionary! Make sure it is in the same folder as the .exe\n");
         return;
     }
 
