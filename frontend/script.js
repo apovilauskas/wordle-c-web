@@ -63,7 +63,7 @@ async function submitGuess(guess) {
     if (!response.ok) {
         return { error: data?.error || "Server error" };
     }
-
+    console.log("Guess submitted:", guess, "Result:", data.result);
     return data.result;
 }
 

@@ -34,13 +34,18 @@ int* evaluateGuess(const char* secret_word, const char* guess) {
 }
 
 char* createJsonResult(int results[]) {
-    char* result_str = malloc(6);
-    if (!result_str) return NULL;
-
+    // Allocate memory for JSON string
+    char* json = malloc(100);
+    
+    // Convert [2,1,0,2,1] to "21021" string format
+    char result_str[6];
     for (int i = 0; i < 5; i++) {
         result_str[i] = '0' + results[i]; // Convert int to char
     }
     result_str[5] = '\0';
-
-    return result_str;
+    
+    // Create JSON: {"result":"21021"}
+    snprintf(json, 100, "{\"result\":\"%s\"}", result_str);
+    
+    return json;
 }
