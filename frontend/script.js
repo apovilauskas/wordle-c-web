@@ -116,26 +116,26 @@ function updateBoard(result, guess) {
     console.log(result)
 
     // Update keyboard
-    updateKeyboard(result, guess); 
+    updateKeyboard(result, guess);
 
     // Check if won
-        if (result === '22222') {
-            inputBlocked = true; // block further input
+    if (result === '22222') {
+        inputBlocked = true; // block further input
 
-            const board = document.getElementById("board");
-            const row = board.querySelectorAll(".row")[currentRow];
-            row.classList.add('won'); // Add a special class for winning row
-            setTimeout(() => {                    
-                    showGameOver("You won! Congratulations!");
-            }, 3000);
-              
-            return;
-        } else if (currentRow >= ROWS - 1) {
-            inputBlocked = true; // block further input
-            setTimeout(() => {   
-                showGameOver("You lost! Better luck next time.");
-            }, 2000);
-        }
+        const board = document.getElementById("board");
+        const row = board.querySelectorAll(".row")[currentRow];
+        row.classList.add('won'); // Add a special class for winning row
+        setTimeout(() => {
+            showGameOver("You won! Congratulations!");
+        }, 3000);
+
+        return;
+    } else if (currentRow >= ROWS - 1) {
+        inputBlocked = true; // block further input
+        setTimeout(() => {
+            showGameOver("You lost! Better luck next time.");
+        }, 2000);
+    }
 }
 
 function updateKeyboard(result, guess) {
@@ -160,8 +160,8 @@ function updateKeyboard(result, guess) {
                 key.classList.add('absent');
             }
         }
-            // Animation 
-            key.style.transition = 'transform 0.5s ease, background-color 0.5s ease';
+        // Animation 
+        key.style.transition = 'transform 0.5s ease, background-color 0.5s ease';
     }
 }
 
@@ -277,8 +277,6 @@ function removeLetter() {
 async function handleEnter() {
     if (inputBlocked) return;
 
-
-
     if (currentCol < COLS) {
         shakeRow();
         return; // not enough letters
@@ -292,7 +290,7 @@ async function handleEnter() {
         return; // invalid word
     }
 
-    updateBoard(response, word); 
+    updateBoard(response, word);
 
     currentRow++;
     currentCol = 0;
@@ -321,38 +319,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     keyboard.addEventListener("click", async (e) => {
         if (inputBlocked) return;
-        document.querySelectorAll(".key").forEach(btn => {
-            btn.addEventListener("click", () => {
-                btn.blur(); // remove focus outline
-
-                btn.classList.add("pressed");
-                setTimeout(() => {
-                    btn.classList.remove("pressed");
-                }, 100);
-            });
-        });
 
         const key = e.target.closest(".key");
         if (!key) return;
 
-        // BACKSPACE
         if (key.id === "backspace") {
             removeLetter();
             return;
         }
 
-        // ENTER
         if (key.id === "enter") {
             await handleEnter();
             return;
         }
 
-        // LETTER
         const letter = key.textContent;
         if (/^[A-Z]$/.test(letter)) {
             addLetter(letter);
         }
     });
+
 
     document.addEventListener("keydown", async (e) => {
         if (inputBlocked) return; // ignore input if blocked
