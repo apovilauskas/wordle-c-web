@@ -290,19 +290,25 @@ function removeLetter() {
 async function handleEnter() {
     if (inputBlocked) return;
 
-    if (currentCol !== COLS) {
+    const board = document.getElementById("board");
+    const row = board.querySelectorAll(".row")[currentRow];
+    const tiles = row.querySelectorAll(".tile");
+
+    // Collect the word from the current row
+    const word = Array.from(tiles).map(tile => tile.textContent).join('');
+
+    if (word.length !== COLS || word.includes('')) {
         shakeRow();
         return;
     }
 
-    inputBlocked = true; // block further input until processing is done
+    inputBlocked = true; // Block input during processing
 
-    const word = getCurrentWord();
     const response = await submitGuess(word);
 
     if (response.error) {
         shakeRow();
-        inputBlocked = false; // unblock input
+        inputBlocked = false; // Unblock input
         return;
     }
 
