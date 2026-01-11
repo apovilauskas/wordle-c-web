@@ -306,10 +306,12 @@ async function handleEnter() {
     const tiles = row.querySelectorAll(".tile");
     const word = Array.from(tiles).map(t => t.textContent).join('');
 
-    if (tiles.some(tile => tile.textContent === '')) { // check for empty tiles
+    const tilesArray = Array.from(tiles);
+    if (tilesArray.some(tile => tile.textContent === '')) {
         shakeRow();
-        return;
+        return; 
     }
+
 
     inputBlocked = true;
 
