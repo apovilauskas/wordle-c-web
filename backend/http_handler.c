@@ -15,13 +15,13 @@
 void serve_file(int socket, const char* path, const char* content_type) {
     char full_path[512];
     // This looks into the frontend folder relative to where the server runs
-    snprintf(full_path, sizeof(full_path), "../frontend%s", path);
+    snprintf(full_path, sizeof(full_path), "/app/frontend%s", path);
     
     FILE* f = fopen(full_path, "rb");
     if (!f) {
         // If file not found in frontend, try root (for index.html at /)
         if (strcmp(path, "/") == 0) {
-            f = fopen("../frontend/index.html", "rb");
+            f = fopen("/app/frontend/index.html", "rb");
         }
     }
 
