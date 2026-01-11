@@ -37,23 +37,36 @@ async function startNewGame() {
 async function submitGuess(guess) {
     if (!sessionId) return { error: "Game not started" };
 
-    const response = await fetch(`${API_URL}/guess`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            guess: guess.toUpperCase(),
-            sessionId
-        })
-    });
+    let response;
+    try {
+        response = await fetch(`${API_URL}/guess`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                guess: guess.toUpperCase(),
+                sessionId
+            })
+        });
+    } catch (e) {
+        console.error("Network error:", e);
+        return { error: "Network error" };
+    }
 
-    const data = await response.json();
+    let data;
+    try {
+        data = await response.json();
+    } catch (e) {
+        console.error("Server returned invalid JSON:", await response.text());
+        return { error: "Server returned invalid data" };
+    }
 
     if (!response.ok) {
-        return { error: data.error || "Word not found" };
+        return { error: data?.error || "Server error" };
     }
 
     return data.result;
 }
+
 
 function resetBoard() {
     const board = document.getElementById("board");

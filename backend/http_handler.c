@@ -189,7 +189,7 @@ void handle_guess(int socket, char *request)
     char *json_result = createJsonResult(result);
 
     send_response(socket, 200, "application/json", json_result);
-
+    
     free(result);
     free(json_result);
 }
