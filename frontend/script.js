@@ -277,24 +277,29 @@ function removeLetter() {
 async function handleEnter() {
     if (inputBlocked) return;
 
-    if (currentCol < COLS) {
+    if (currentCol !== COLS) {
         shakeRow();
-        return; // not enough letters
+        return;
     }
+
+    inputBlocked = true; // block further input until processing is done
 
     const word = getCurrentWord();
     const response = await submitGuess(word);
 
     if (response.error) {
         shakeRow();
-        return; // invalid word
+        inputBlocked = false; // unblock input
+        return;
     }
 
     updateBoard(response, word);
 
     currentRow++;
     currentCol = 0;
+    inputBlocked = false;
 }
+
 
 ////////// Animations //////////
 function shakeRow() {
@@ -341,6 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     document.addEventListener("keydown", async (e) => {
+        if (e.repeat) return;
         if (inputBlocked) return; // ignore input if blocked
 
         // BACKSPACE
