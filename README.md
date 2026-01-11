@@ -1,40 +1,54 @@
 # Wordle-C-Web
 
-A Wordle clone with a **C backend** and **HTML/CSS frontend**, developed as a 3-stage project.
-
----
-
 ## Project Overview
-This project recreates the classic Wordle game.  
-It includes:
-- A **static web interface** (Stage 1)
-- A **reusable C module** with core Wordle logic (Stage 2)
-- A **console app** that automatically generates and customizes HTML pages (Stage 3)
+
+We, @apovilauskas (backend) and @VlaSarnovskij (frontend), created a Wordle clone with a C backend, HTML/CSS/JS frontend, and a healthy dose of AI assistance.
+
+This project was a fun challenge: building a full web game in **C**, a language not commonly used for web servers. It combines traditional web technologies with low-level socket programming to make Wordle run online.
 
 ---
 
-## Stages & Deadlines
+## Why We Did This
 
-| Stage | Deadline |
-|-------|-----------|
-| **Stage 1** | 30 Nov |
-| **Stage 2** | 21 Dec | 
-| **Stage 3** | 11 Jan |
+- **Wordle game:** simple, popular, and universally playable.  
+- **C for the backend:** to push our skills and tackle a challenge — most web games use Python, Node.js, or Java.  
+- **AI assistance:** helped us debug Docker, file paths, and HTTP handling, which is tricky in C.
 
 ---
 
-## Live Demo
-Once Stage 1 is complete, the static site will be hosted:
-> [here](https://wordle-c-web.vercel.app)
+## How It Works
+
+1. **Backend (C):**  
+   - Runs a server on a specified port (usually 8080).  
+   - Waits for requests from a browser.  
+   - Reads files like `index.html`, `style.css`, and `script.js` from disk and sends them to the browser.  
+   - Handles API requests for starting a new game or submitting a guess.  
+   - Tracks sessions and game state (which word is secret, guesses so far).
+
+2. **Frontend (HTML/CSS/JS):**  
+   - Browser receives HTML, CSS, and JS from backend.  
+   - JS interacts with the backend via HTTP POST requests (`/api/new-game`, `/api/guess`).  
+   - Updates the board UI dynamically based on responses.  
+   - Handles user input (typing letters, pressing Enter, keyboard clicks) and animations.
+
+3. **How Files Interact:**  
+   - `server.c` — sets up sockets, listens for connections, and calls `handle_http_request()` for each request.  
+   - `http_handler.c` — decides what to do with each request: serve static files or process API calls.  
+   - `words.c` — loads the word dictionary, picks a secret word, and validates guesses.  
+   - `game_state.c` — manages active game sessions and stores current words and guesses.  
+   - `logic.c` — checks guesses against the secret word and generates results (correct/present/absent).  
+   - `frontend/` — contains HTML, CSS, JS, and icon files for the user interface.  
+
+4. **User Flow:**  
+   - Browser requests `/index.html`.  
+   - Backend serves the HTML, CSS, JS, and icons.  
+   - JS starts a new game via `/api/new-game`.  
+   - Player types guesses; JS sends them to `/api/guess`.  
+   - Backend checks the guess, responds with result.  
+   - JS updates the UI based on the response (colors, keyboard hints, win/loss messages).
 
 ---
 
-## Team
-| Member | Role | Responsibility |
-|--------|------|----------------|
-| @apovilauskas | Architect, Exhibitor | Defines project structure, logic, features, creates the overall plan. Presents the final structure and mp4 of the demo, explain decisions |
-| @VlaSarnovskij | Designer (Frontend)| Creates the visual side, builds HTML, CSS layout |
-| [Name 3] | Builder (Backend) | Builds the functionality of code according to structure, implements C backend and frontend interactions |
-| [Name 3] | Critic | Reviews the code, structure and design, gives feedback on what to improve |
+## Play It Now
 
----
+[Click here to play Wordle-C-Web!](https://wordle-c-web.onrender.com/)
