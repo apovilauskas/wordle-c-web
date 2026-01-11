@@ -250,6 +250,7 @@ function getCurrentWord() {
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
     const row = rows[currentRow]; // current row
+    if (!row) return ""; // safety check
 
     let word = "";
     for (let i = 0; i < row.children.length; i++) {
@@ -261,54 +262,71 @@ function getCurrentWord() {
 }
 
 function addLetter(letter) {
-    if (currentCol >= 5) {                  // if column limit reached
-        console.log("Column limit reached!");
-        shakeRow();
-        return;
-    }
     const board = document.getElementById("board"); // search for the board element
     const rows = board.querySelectorAll(".row");  // get all rows
     const row = rows[currentRow];           // choose the current row
     const tile = row.children[currentCol]; // choose the current tile
+    if (!row) return;                     // safety check
+
+    if (currentCol >= COLS) {          // if at the end of the row, do nothing
+        console.log("Column limit reached!");
+        shakeRow();
+        return;
+    }
 
     tile.textContent = letter;              // enter the letter into the tile
     ++currentCol;                           // move to the next column
 }
 
 function removeLetter() {
-    if (currentCol === 0) return;           // if at the beginning of the row, do nothing
-
-    --currentCol;                            // return to the previous column
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
     const row = rows[currentRow];
-    const tile = row.children[currentCol];
+    if (!row) return; // safety check
 
-    tile.textContent = "";                   // clear the letter from the tile
+    if (currentCol === 0) return;
+
+    currentCol--;
+    row.children[currentCol].textContent = "";
 }
 
 async function handleEnter() {
     if (inputBlocked) return;
 
     const board = document.getElementById("board");
-    const row = board.querySelectorAll(".row")[currentRow];
+    const rows = board.querySelectorAll(".row");
+    const row = rows[currentRow];
+
+    if (!row) { // safety check
+        console.warn("No row found for currentRow", currentRow);
+        inputBlocked = false;
+        return;
+    }
+
     const tiles = row.querySelectorAll(".tile");
+    const word = Array.from(tiles).map(t => t.textContent).join('');
 
-    // Collect the word from the current row
-    const word = Array.from(tiles).map(tile => tile.textContent).join('');
-
-    if (word.length !== COLS || word.includes('')) {
+    if (tiles.some(tile => tile.textContent === '')) { // check for empty tiles
         shakeRow();
         return;
     }
 
-    inputBlocked = true; // Block input during processing
+    inputBlocked = true;
 
-    const response = await submitGuess(word);
+    let response;
+    try {
+        response = await submitGuess(word);
+    } catch (e) {
+        console.error("Submit failed:", e);
+        shakeRow();
+        inputBlocked = false;
+        return;
+    }
 
     if (response.error) {
+        console.warn("Guess error:", response.error);
         shakeRow();
-        inputBlocked = false; // Unblock input
+        inputBlocked = false;
         return;
     }
 
@@ -318,6 +336,7 @@ async function handleEnter() {
     currentCol = 0;
     inputBlocked = false;
 }
+
 
 
 ////////// Animations //////////
