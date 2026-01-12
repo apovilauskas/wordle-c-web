@@ -162,6 +162,8 @@ header .title {
 
     user-select: none;
     outline: none;
+
+    transition: background-color 0.5s ease, transform 0.2s ease;
 }
 .key-large {
     flex: 1.5;

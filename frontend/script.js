@@ -114,12 +114,18 @@ function updateBoard(result, guess, serverData) {
     updateKeyboard(result, guess);
 
     if (serverData.status === "won") {
-        inputBlocked = true;
-        setTimeout(() => {
-            showGameOver("You won! Congratulations!");
-        }, 2000);
-        return;
+    inputBlocked = true;
+
+    const board = document.getElementById("board");
+    const row = board.querySelectorAll(".row")[currentRow];
+    row.classList.add("won");  // Add won class for animation
+    // Show game over modal after animation
+    setTimeout(() => {
+        showGameOver("You won! Congratulations!");
+    }, result.length * 150 + 500);  
+    return;
     }
+
 
     if (serverData.status === "lost") {
         inputBlocked = true;
