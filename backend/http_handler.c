@@ -1,5 +1,3 @@
-c
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,107 +48,76 @@ void serve_file(int socket, const char *path, const char *content_type)
     }
 }
 
+// Helper to safely receive and parse HTTP body
+void receive_full_body(int socket, char *request, int initial_bytes, char *body, int max_body_len)
+{
+    // Find Content-Length header
+    int content_length = 0;
+    char *cl_header = strstr(request, "Content-Length: ");
+    if (cl_header)
+    {
+        sscanf(cl_header, "Content-Length: %d", &content_length);
+    }
+
+    // Find where headers end
+    char *body_start = strstr(request, "\r\n\r\n");
+    if (!body_start)
+    {
+        body[0] = '\0';
+        printf("DEBUG: Could not find end of headers\n");
+        return;
+    }
+    body_start += 4; // Move past \r\n\r\n
+
+    // Calculate how many body bytes we already have
+    int body_offset = body_start - request;
+    int bytes_in_buffer = initial_bytes - body_offset;
+
+    if (bytes_in_buffer > 0)
+    {
+        memcpy(body, body_start, bytes_in_buffer < max_body_len ? bytes_in_buffer : max_body_len);
+    }
+
+    // If we don't have the full body yet, receive more data
+    int total_body_bytes = bytes_in_buffer;
+    while (total_body_bytes < content_length)
+    {
+        int remaining = content_length - total_body_bytes;
+        int to_read = remaining < (BUFFER_SIZE - 1) ? remaining : (BUFFER_SIZE - 1);
+        
+        int bytes_received = recv(socket, body + total_body_bytes, to_read, 0);
+        if (bytes_received <= 0)
+        {
+            printf("DEBUG: Connection closed or error receiving body\n");
+            break; // Connection closed or error
+        }
+        
+        total_body_bytes += bytes_received;
+    }
+
+    // Null-terminate the body
+    if (total_body_bytes < max_body_len)
+    {
+        body[total_body_bytes] = '\0';
+    }
+    else
+    {
+        body[max_body_len - 1] = '\0';
+    }
+
+    printf("DEBUG: Received %d bytes of body (expected %d)\n", total_body_bytes, content_length);
+}
+
 void handle_http_request(int socket)
 {
     char buffer[BUFFER_SIZE] = {0};
-    size_t total_received = 0;
-    char *header_end = NULL;
-    long content_length = -1; // -1 means not found yet
-
-    while (total_received < BUFFER_SIZE - 1)
-    {
-        int bytes = recv(socket, buffer + total_received, BUFFER_SIZE - 1 - total_received, 0);
-        if (bytes <= 0)
-        {
-            // Error or connection closed
-            return;
-        }
-        total_received += bytes;
-        buffer[total_received] = '\0';
-
-        if (!header_end)
-        {
-            header_end = strstr(buffer, "\r\n\r\n");
-            if (header_end)
-            {
-                // Temporarily null-terminate headers for parsing
-                *header_end = '\0';
-
-                // Parse headers to find Content-Length
-                char *header_str = buffer;
-                // Skip request line
-                char *line = strstr(header_str, "\r\n");
-                if (line)
-                {
-                    header_str = line + 2;
-                }
-
-                while (header_str && *header_str)
-                {
-                    if (strncasecmp(header_str, "Content-Length:", 15) == 0)
-                    {
-                        char *value_start = header_str + 15;
-                        while (*value_start == ' ') value_start++; // Skip spaces
-                        content_length = atol(value_start);
-                        break; // We only need Content-Length for now
-                    }
-                    line = strstr(header_str, "\r\n");
-                    if (line)
-                    {
-                        header_str = line + 2;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                // Restore the buffer
-                *header_end = '\r';
-
-                // If no Content-Length, assume 0
-                if (content_length == -1)
-                {
-                    content_length = 0;
-                }
-
-                // Calculate expected total size
-                size_t headers_size = (header_end - buffer) + 4;
-                size_t expected_total = headers_size + content_length;
-
-                if (expected_total > BUFFER_SIZE - 1)
-                {
-                    send_response(socket, 413, "text/plain", "Payload Too Large");
-                    return;
-                }
-
-                // If we already have the full body, break
-                if (total_received >= expected_total)
-                {
-                    break;
-                }
-            }
-        }
-        else
-        {
-            // Headers found, continuing to receive body
-            size_t headers_size = (header_end - buffer) + 4;
-            size_t expected_total = headers_size + content_length;
-            if (total_received >= expected_total)
-            {
-                break;
-            }
-        }
-    }
-
-    // Check if request is complete
-    if (!header_end || (content_length >= 0 && total_received < ((header_end - buffer) + 4 + content_length)))
-    {
-        send_response(socket, 400, "text/plain", "Incomplete request");
+    int bytes_received = recv(socket, buffer, BUFFER_SIZE - 1, 0);
+    
+    if (bytes_received <= 0)
         return;
-    }
 
-    // Parse method, path, version from the request line
+    buffer[bytes_received] = '\0'; // Null-terminate
+
     char method[16], path[256], version[16];
     sscanf(buffer, "%s %s %s", method, path, version);
 
@@ -161,7 +128,7 @@ void handle_http_request(int socket)
     }
     else if (strcmp(method, "POST") == 0 && strcmp(path, "/api/guess") == 0)
     {
-        handle_guess(socket, buffer);
+        handle_guess(socket, buffer, bytes_received);
     }
     // 2. Handle CORS Preflight
     else if (strcmp(method, "OPTIONS") == 0)
@@ -227,18 +194,24 @@ void extract_json_value(const char *body, const char *key, char *dest, int max_l
         }
         dest[i] = '\0'; // Null-terminate cleanly
     }
+    else
+    {
+        dest[0] = '\0';
+    }
 }
 
-void handle_guess(int socket, char *request)
+void handle_guess(int socket, char *request, int request_size)
 {
-    // 1. Extract Body
-    char *body = strstr(request, "\r\n\r\n");
-    if (!body)
+    // 1. Extract and receive full body
+    char body[4096] = {0};
+    receive_full_body(socket, request, request_size, body, sizeof(body));
+
+    if (body[0] == '\0')
     {
+        printf("DEBUG: Failed to extract body\n");
         send_response(socket, 400, "application/json", "{\"error\":\"Invalid request\"}");
         return;
     }
-    body += 4;
 
     // 2. Parse JSON cleanly
     char guess[10] = {0};      
@@ -247,38 +220,47 @@ void handle_guess(int socket, char *request)
     extract_json_value(body, "guess", guess, sizeof(guess));
     extract_json_value(body, "sessionId", session_id, sizeof(session_id));
 
+    printf("DEBUG: Raw body: '%s'\n", body);
     printf("DEBUG: Parsed Guess: '[%s]', Session: '[%s]'\n", guess, session_id);
 
-    // 3. Force Guess to Uppercase
+    // 3. Validate inputs
+    if (strlen(guess) == 0 || strlen(session_id) == 0)
+    {
+        printf("DEBUG: Empty guess or session_id\n");
+        send_response(socket, 400, "application/json", "{\"error\":\"Missing guess or sessionId\"}");
+        return;
+    }
+
+    // 4. Force Guess to Uppercase
     for (int i = 0; guess[i]; i++)
     {
         guess[i] = toupper((unsigned char)guess[i]);
     }
 
-    // 4. Validate Word length & Dictionary
-    //if (strlen(guess) != 5)
-    //{
-    //    send_response(socket, 400, "application/json", "{\"error\":\"Guess must be 5 letters\"}");
-    //    return;
-    //}
+    // 5. Validate Word length & Dictionary
+    if (strlen(guess) != 5)
+    {
+        send_response(socket, 400, "application/json", "{\"error\":\"Guess must be 5 letters\"}");
+        return;
+    }
 
     if (!isValidGuess(guess))
     {
         // Debugging output
         printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
-        for(int i = 0; i < strlen(guess); i++) {
-            printf("Char %d = '%c' (%d)\n", i, guess[i], (int)guess[i]);
+        for(int i = 0; i < strlen(guess); i++)
+        {
+            printf("Char %d = '%c' (0x%02X)\n", i, guess[i], (unsigned char)guess[i]);
         }
 
         // Send error response with debug info
         char buffer[128];
         snprintf(buffer, sizeof(buffer), "{\"error\":\"Invalid word\",\"debug\":\"%s\"}", guess);
-        send_response(socket, 200, "application/json", buffer);
-
+        send_response(socket, 400, "application/json", buffer);
         return;
     }
-    // 5. Get Full Game State (To track attempts)
-    // NOTE: You must implement get_game_state in game_state.c (see below)
+
+    // 6. Get Full Game State (To track attempts)
     GameState *game = get_game_state(session_id);
     
     if (game == NULL)
@@ -288,7 +270,7 @@ void handle_guess(int socket, char *request)
         return;
     }
 
-    // 6. Evaluate Logic
+    // 7. Evaluate Logic
     int *result = evaluateGuess(game->secret_word, guess);
     
     // Increment attempts
@@ -296,29 +278,33 @@ void handle_guess(int socket, char *request)
 
     // Check if player won (all 2s)
     int won = 1;
-    for(int i=0; i<5; i++) {
+    for(int i = 0; i < 5; i++)
+    {
         if(result[i] != 2) won = 0;
     }
 
-    // 7. Construct JSON Response
+    // 8. Construct JSON Response
     char json_response[512]; // Large buffer for safety
     char result_str[6];
     
     // Convert int array (2,0,1,2,0) to string "20120"
-    for(int i=0; i<5; i++) result_str[i] = '0' + result[i];
+    for(int i = 0; i < 5; i++) result_str[i] = '0' + result[i];
     result_str[5] = '\0';
 
-    if (won) {
+    if (won)
+    {
         snprintf(json_response, sizeof(json_response), 
             "{\"result\":\"%s\", \"status\":\"won\", \"attempts\":%d}", 
             result_str, game->attempts);
     } 
-    else if (game->attempts >= 6) {
+    else if (game->attempts >= 6)
+    {
         snprintf(json_response, sizeof(json_response), 
             "{\"result\":\"%s\", \"status\":\"lost\", \"secretWord\":\"%s\"}", 
             result_str, game->secret_word);
     } 
-    else {
+    else
+    {
         snprintf(json_response, sizeof(json_response), 
             "{\"result\":\"%s\", \"status\":\"active\", \"attempts\":%d}", 
             result_str, game->attempts);
