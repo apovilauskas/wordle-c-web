@@ -247,10 +247,11 @@ void handle_guess(int socket, char *request, int request_size)
     if (!isValidGuess(guess))
     {
         // Debugging output
-        printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
-        for(int i = 0; i < strlen(guess); i++)
+        size_t guess_len = strlen(guess);
+        printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, guess_len);
+        for(size_t i = 0; i < guess_len; i++)
         {
-            printf("Char %d = '%c' (0x%02X)\n", i, guess[i], (unsigned char)guess[i]);
+            printf("Char %zu = '%c' (0x%02X)\n", i, guess[i], (unsigned char)guess[i]);
         }
 
         // Send error response with debug info
