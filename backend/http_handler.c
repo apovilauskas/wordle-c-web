@@ -10,7 +10,6 @@
 #include "words.h"
 
 #define BUFFER_SIZE 32768
-#define _DEFAULT_SOURCE
 
 // Helper to serve actual files (index.html, style.css, etc.)
 void serve_file(int socket, const char *path, const char *content_type)
@@ -54,8 +53,8 @@ void handle_http_request(int socket)
     char buffer[BUFFER_SIZE] = {0};
     int bytes_received = recv(socket, buffer, BUFFER_SIZE, 0);
     
-    if (bytes_received <= 0) return;
-    usleep(10000);
+    if (bytes_received <= 0)
+        return;
 
     char method[16], path[256], version[16];
     sscanf(buffer, "%s %s %s", method, path, version);
@@ -172,7 +171,7 @@ if (!isValidGuess(guess))
 {
     // Debugging output
     printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
-    for(size_t i = 0; i < strlen(guess); i++) {
+    for(int i = 0; i < strlen(guess); i++) {
         printf("Char %d = '%c' (%d)\n", i, guess[i], (int)guess[i]);
     }
 
