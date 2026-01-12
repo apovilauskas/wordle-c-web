@@ -10,6 +10,7 @@
 #include "words.h"
 
 #define BUFFER_SIZE 32768
+#define _DEFAULT_SOURCE
 
 // Helper to serve actual files (index.html, style.css, etc.)
 void serve_file(int socket, const char *path, const char *content_type)
@@ -171,7 +172,7 @@ if (!isValidGuess(guess))
 {
     // Debugging output
     printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
-    for(int i = 0; i < strlen(guess); i++) {
+    for(size_t i = 0; i < strlen(guess); i++) {
         printf("Char %d = '%c' (%d)\n", i, guess[i], (int)guess[i]);
     }
 
