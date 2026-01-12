@@ -48,24 +48,18 @@ async function submitGuess(guess) {
             })
         });
     } catch (e) {
-        console.error("Network error:", e);
         return { error: "Network error" };
     }
 
-    let data;
-    try {
-        data = await response.json();
-    } catch (e) {
-        console.error("Server returned invalid JSON:", await response.text());
-        return { error: "Server returned invalid data" };
-    }
+    const data = await response.json();
 
     if (!response.ok) {
-        return { error: data?.error || "Server error" };
+        return { error: data.error || "Server error" };
     }
-    console.log("Guess submitted:", guess, "Result:", data.result);
-    return data.result;
+
+    return data;
 }
+
 
 
 function resetBoard() {
@@ -103,50 +97,36 @@ function resetKeyboard() {
 
 
 // Update board with result
-function updateBoard(result, guess) {
+function updateBoard(result, guess, serverData) {
     const board = document.getElementById("board");
     const row = board.querySelectorAll(".row")[currentRow];
 
-
     for (let i = 0; i < result.length; i++) {
         const tile = row.children[i];
-
         setTimeout(() => {
-            if (result[i] === '2') {
-                tile.classList.add('correct'); // Green
-            } else if (result[i] === '1') {
-                tile.classList.add('present'); // Yellow
-            } else {
-                tile.classList.add('absent'); // Grey
-            }
-
-            // Animation 
-            tile.style.transition = 'transform 0.2s ease, background-color 0.5s ease';
-            tile.style.transform = 'scale(1.2)';
-            setTimeout(() => tile.style.transform = 'scale(1)', 150);
-        }, i * 150); // Staggered delay for flip effect
+            tile.classList.add(
+                result[i] === '2' ? 'correct' :
+                result[i] === '1' ? 'present' : 'absent'
+            );
+        }, i * 150);
     }
-    console.log(result)
 
-    // Update keyboard
     updateKeyboard(result, guess);
 
-    // Check if won
-    if (result === '22222') {
-        inputBlocked = true; // block further input
-
-        const board = document.getElementById("board");
-        const row = board.querySelectorAll(".row")[currentRow];
-        row.classList.add('won'); // Add a special class for winning row
+    if (serverData.status === "won") {
+        inputBlocked = true;
         setTimeout(() => {
             showGameOver("You won! Congratulations!");
-        }, 3000);
-
+        }, 2000);
         return;
-    } else if (currentRow >= ROWS - 1) {
-        inputBlocked = true; // block further input
+    }
+
+    if (serverData.status === "lost") {
+        inputBlocked = true;
         setTimeout(() => {
-            showGameOver("You lost! Better luck next time.");
+            showGameOver(
+                `You lost! The word was: ${serverData.secretWord}`
+            );
         }, 2000);
     }
 }
@@ -332,7 +312,7 @@ async function handleEnter() {
         return;
     }
 
-    updateBoard(response, word);
+    updateBoard(response.result, word, response);
 
     currentRow++;
     currentCol = 0;
