@@ -9,17 +9,10 @@ const COLS = 5;
 let currentRow = 0;  // global variable for current row
 let currentCol = 0;  // global variable for current column
 
-let inputBlocked = true;
-let gameReady = false;
-let sessionId = null;
-
+let inputBlocked = false;
 
 // Start new game
 async function startNewGame() {
-    inputBlocked = true;
-    gameReady = false;
-    sessionId = null;
-
     try {
         const response = await fetch(`${API_URL}/new-game`, {
             method: 'POST',
@@ -28,13 +21,12 @@ async function startNewGame() {
 
         const data = await response.json();
         sessionId = data.sessionId;
-        // console.log('New game started:', sessionId);
+        console.log('New game started:', sessionId);
 
+        // Reset your board UI here
         resetBoard();
         resetKeyboard();
-
-        gameReady = true;
-        inputBlocked = false; 
+        inputBlocked = false; // unblock input
 
     } catch (error) {
         console.error('Error starting game:', error);
@@ -231,6 +223,7 @@ document.querySelector('.title').addEventListener("click", () => {
 // New Game button (works both on game-over or header)
 newGameBtn.addEventListener("click", async () => {
     gameOverModal.classList.add("hidden");
+    inputBlocked = false;
     await startNewGame();
 });
 
@@ -298,7 +291,7 @@ function removeLetter() {
 }
 
 async function handleEnter() {
-    if (inputBlocked || !gameReady) return;
+    if (inputBlocked) return;
 
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
@@ -341,11 +334,9 @@ async function handleEnter() {
 
     updateBoard(response, word);
 
-    if (response !== '22222' && currentRow < ROWS - 1) {
     currentRow++;
     currentCol = 0;
     inputBlocked = false;
-    }
 }
 
 
@@ -371,9 +362,32 @@ document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
     const keyboard = document.getElementById("keyboard");
 
+    keyboard.addEventListener("click", async (e) => {
+        if (inputBlocked) return;
+
+        const key = e.target.closest(".key");
+        if (!key) return;
+
+        if (key.id === "backspace") {
+            removeLetter();
+            return;
+        }
+
+        if (key.id === "enter") {
+            await handleEnter();
+            return;
+        }
+
+        const letter = key.textContent;
+        if (/^[A-Z]$/.test(letter)) {
+            addLetter(letter);
+        }
+    });
+
+
     document.addEventListener("keydown", async (e) => {
         if (e.repeat) return;
-        if (inputBlocked || !gameReady) return; // ignore input if blocked
+        if (inputBlocked) return; // ignore input if blocked
 
         // BACKSPACE
         if (e.key === "Backspace") {
