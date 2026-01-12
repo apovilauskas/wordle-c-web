@@ -9,10 +9,17 @@ const COLS = 5;
 let currentRow = 0;  // global variable for current row
 let currentCol = 0;  // global variable for current column
 
-let inputBlocked = false;
+let inputBlocked = true;
+let gameReady = false;
+let sessionId = null;
+
 
 // Start new game
 async function startNewGame() {
+    inputBlocked = true;
+    gameReady = false;
+    sessionId = null;
+
     try {
         const response = await fetch(`${API_URL}/new-game`, {
             method: 'POST',
@@ -21,12 +28,13 @@ async function startNewGame() {
 
         const data = await response.json();
         sessionId = data.sessionId;
-        console.log('New game started:', sessionId);
+        // console.log('New game started:', sessionId);
 
-        // Reset your board UI here
         resetBoard();
         resetKeyboard();
-        inputBlocked = false; // unblock input
+
+        gameReady = true;
+        inputBlocked = false; 
 
     } catch (error) {
         console.error('Error starting game:', error);
@@ -37,23 +45,36 @@ async function startNewGame() {
 async function submitGuess(guess) {
     if (!sessionId) return { error: "Game not started" };
 
-    const response = await fetch(`${API_URL}/guess`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            guess: guess.toUpperCase(),
-            sessionId
-        })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        return { error: data.error || "Word not found" };
+    let response;
+    try {
+        response = await fetch(`${API_URL}/guess`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                guess: guess.toUpperCase(),
+                sessionId
+            })
+        });
+    } catch (e) {
+        console.error("Network error:", e);
+        return { error: "Network error" };
     }
 
+    let data;
+    try {
+        data = await response.json();
+    } catch (e) {
+        console.error("Server returned invalid JSON:", await response.text());
+        return { error: "Server returned invalid data" };
+    }
+
+    if (!response.ok) {
+        return { error: data?.error || "Server error" };
+    }
+    console.log("Guess submitted:", guess, "Result:", data.result);
     return data.result;
 }
+
 
 function resetBoard() {
     const board = document.getElementById("board");
@@ -116,26 +137,26 @@ function updateBoard(result, guess) {
     console.log(result)
 
     // Update keyboard
-    updateKeyboard(result, guess); 
+    updateKeyboard(result, guess);
 
     // Check if won
-        if (result === '22222') {
-            inputBlocked = true; // block further input
+    if (result === '22222') {
+        inputBlocked = true; // block further input
 
-            const board = document.getElementById("board");
-            const row = board.querySelectorAll(".row")[currentRow];
-            row.classList.add('won'); // Add a special class for winning row
-            setTimeout(() => {                    
-                    showGameOver("You won! Congratulations!");
-            }, 3000);
-              
-            return;
-        } else if (currentRow >= ROWS - 1) {
-            inputBlocked = true; // block further input
-            setTimeout(() => {   
-                showGameOver("You lost! Better luck next time.");
-            }, 2000);
-        }
+        const board = document.getElementById("board");
+        const row = board.querySelectorAll(".row")[currentRow];
+        row.classList.add('won'); // Add a special class for winning row
+        setTimeout(() => {
+            showGameOver("You won! Congratulations!");
+        }, 3000);
+
+        return;
+    } else if (currentRow >= ROWS - 1) {
+        inputBlocked = true; // block further input
+        setTimeout(() => {
+            showGameOver("You lost! Better luck next time.");
+        }, 2000);
+    }
 }
 
 function updateKeyboard(result, guess) {
@@ -160,8 +181,8 @@ function updateKeyboard(result, guess) {
                 key.classList.add('absent');
             }
         }
-            // Animation 
-            key.style.transition = 'transform 0.5s ease, background-color 0.5s ease';
+        // Animation 
+        key.style.transition = 'transform 0.5s ease, background-color 0.5s ease';
     }
 }
 
@@ -210,7 +231,6 @@ document.querySelector('.title').addEventListener("click", () => {
 // New Game button (works both on game-over or header)
 newGameBtn.addEventListener("click", async () => {
     gameOverModal.classList.add("hidden");
-    inputBlocked = false;
     await startNewGame();
 });
 
@@ -237,6 +257,7 @@ function getCurrentWord() {
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
     const row = rows[currentRow]; // current row
+    if (!row) return ""; // safety check
 
     let word = "";
     for (let i = 0; i < row.children.length; i++) {
@@ -248,55 +269,86 @@ function getCurrentWord() {
 }
 
 function addLetter(letter) {
-    if (currentCol >= 5) {                  // if column limit reached
-        console.log("Column limit reached!");
-        shakeRow();
-        return;
-    }
     const board = document.getElementById("board"); // search for the board element
     const rows = board.querySelectorAll(".row");  // get all rows
     const row = rows[currentRow];           // choose the current row
     const tile = row.children[currentCol]; // choose the current tile
+    if (!row) return;                     // safety check
+
+    if (currentCol >= COLS) {          // if at the end of the row, do nothing
+        console.log("Column limit reached!");
+        shakeRow();
+        return;
+    }
 
     tile.textContent = letter;              // enter the letter into the tile
     ++currentCol;                           // move to the next column
 }
 
 function removeLetter() {
-    if (currentCol === 0) return;           // if at the beginning of the row, do nothing
-
-    --currentCol;                            // return to the previous column
     const board = document.getElementById("board");
     const rows = board.querySelectorAll(".row");
     const row = rows[currentRow];
-    const tile = row.children[currentCol];
+    if (!row) return; // safety check
 
-    tile.textContent = "";                   // clear the letter from the tile
+    if (currentCol === 0) return;
+
+    currentCol--;
+    row.children[currentCol].textContent = "";
 }
 
 async function handleEnter() {
-    if (inputBlocked) return;
+    if (inputBlocked || !gameReady) return;
 
+    const board = document.getElementById("board");
+    const rows = board.querySelectorAll(".row");
+    const row = rows[currentRow];
 
-
-    if (currentCol < COLS) {
-        shakeRow();
-        return; // not enough letters
+    if (!row) { // safety check
+        console.warn("No row found for currentRow", currentRow);
+        inputBlocked = false;
+        return;
     }
 
-    const word = getCurrentWord();
-    const response = await submitGuess(word);
+    const tiles = row.querySelectorAll(".tile");
+    const word = Array.from(tiles).map(t => t.textContent).join('');
+
+    const tilesArray = Array.from(tiles);
+    if (tilesArray.some(tile => tile.textContent === '')) {
+        shakeRow();
+        return; 
+    }
+
+
+    inputBlocked = true;
+
+    let response;
+    try {
+        response = await submitGuess(word);
+    } catch (e) {
+        console.error("Submit failed:", e);
+        shakeRow();
+        inputBlocked = false;
+        return;
+    }
 
     if (response.error) {
+        console.warn("Guess error:", response.error);
         shakeRow();
-        return; // invalid word
+        inputBlocked = false;
+        return;
     }
 
-    updateBoard(response, word); 
+    updateBoard(response, word);
 
+    if (response !== '22222' && currentRow < ROWS - 1) {
     currentRow++;
     currentCol = 0;
+    inputBlocked = false;
+    }
 }
+
+
 
 ////////// Animations //////////
 function shakeRow() {
@@ -319,43 +371,9 @@ document.addEventListener('DOMContentLoaded', () => {
     startNewGame();
     const keyboard = document.getElementById("keyboard");
 
-    keyboard.addEventListener("click", async (e) => {
-        if (inputBlocked) return;
-        document.querySelectorAll(".key").forEach(btn => {
-            btn.addEventListener("click", () => {
-                btn.blur(); // remove focus outline
-
-                btn.classList.add("pressed");
-                setTimeout(() => {
-                    btn.classList.remove("pressed");
-                }, 100);
-            });
-        });
-
-        const key = e.target.closest(".key");
-        if (!key) return;
-
-        // BACKSPACE
-        if (key.id === "backspace") {
-            removeLetter();
-            return;
-        }
-
-        // ENTER
-        if (key.id === "enter") {
-            await handleEnter();
-            return;
-        }
-
-        // LETTER
-        const letter = key.textContent;
-        if (/^[A-Z]$/.test(letter)) {
-            addLetter(letter);
-        }
-    });
-
     document.addEventListener("keydown", async (e) => {
-        if (inputBlocked) return; // ignore input if blocked
+        if (e.repeat) return;
+        if (inputBlocked || !gameReady) return; // ignore input if blocked
 
         // BACKSPACE
         if (e.key === "Backspace") {
