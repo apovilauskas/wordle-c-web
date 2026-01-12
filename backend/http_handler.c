@@ -160,11 +160,11 @@ void handle_guess(int socket, char *request)
     }
 
     // 4. Validate Word length & Dictionary
-    if (strlen(guess) != 5)
-    {
-        send_response(socket, 400, "application/json", "{\"error\":\"Guess must be 5 letters\"}");
-        return;
-    }
+    //if (strlen(guess) != 5)
+    //{
+    //    send_response(socket, 400, "application/json", "{\"error\":\"Guess must be 5 letters\"}");
+    //    return;
+    //}
 
     if (!isValidGuess(guess))
     {
