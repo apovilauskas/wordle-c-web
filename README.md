@@ -38,7 +38,7 @@ This project was a fun challenge: building a full web game in **C**, a language 
    - `server.c` — sets up sockets, listens for connections, and calls `handle_http_request()` for each request.  
    - `http_handler.c` — decides what to do with each request: serve static files or process API calls.  
    - `words.c` — loads the word dictionary, picks a secret word, and validates guesses.
-   - `word.txt` and `secret.txt` - the first holds the possible answers (2000+ words), while guesses are checked from secret.txt, with over 12000.
+   - `word.txt` and `secret.txt` - the first holds all the possible answers (2000+ words), while guesses are checked from secret.txt, with over 12000.
    - `game_state.c` — manages active game sessions and stores current words and guesses.  
    - `logic.c` — checks guesses against the secret word and generates results (correct/present/absent).  
    - `frontend/` — contains HTML, CSS, JS, and icon files for the user interface.  
