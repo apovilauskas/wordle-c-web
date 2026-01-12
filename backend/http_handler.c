@@ -166,12 +166,22 @@ void handle_guess(int socket, char *request)
     //    return;
     //}
 
-    if (!isValidGuess(guess))
-    {
-        printf("DEBUG: Word '%s' not found in dictionary.\n", guess);
-        send_response(socket, 400, "application/json", "{\"error\":\"Invalid word\"}");
-        return;
+ if (!isValidGuess(guess))
+{
+    // Debugging output
+    printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
+    for(int i = 0; i < strlen(guess); i++) {
+        printf("Char %d = '%c' (%d)\n", i, guess[i], (int)guess[i]);
     }
+
+    // Send detailed error response
+    char buffer[128];
+    snprintf(buffer, sizeof(buffer), "{\"error\":\"Invalid word\",\"debug\":\"%s\"}", guess);
+    send_response(socket, 200, "application/json", buffer);
+
+    return;
+}
+
 
     // 5. Get Full Game State (To track attempts)
     // NOTE: You must implement get_game_state in game_state.c (see below)
