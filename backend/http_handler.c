@@ -112,8 +112,6 @@ void handle_new_game(int socket)
     send_response(socket, 200, "application/json", response);
 }
 
-#include <ctype.h> // Needed for toupper
-
 // Helper to extract value cleanly (stops at the closing quote)
 void extract_json_value(const char *body, const char *key, char *dest, int max_len)
 {
@@ -147,8 +145,8 @@ void handle_guess(int socket, char *request)
     body += 4;
 
     // 2. Parse JSON cleanly
-    char guess[10] = {0};      // slightly larger buffer for safety
-    char session_id[64] = {0}; // slightly larger buffer
+    char guess[10] = {0};      
+    char session_id[64] = {0}; 
 
     extract_json_value(body, "guess", guess, sizeof(guess));
     extract_json_value(body, "sessionId", session_id, sizeof(session_id));
@@ -161,7 +159,7 @@ void handle_guess(int socket, char *request)
         guess[i] = toupper((unsigned char)guess[i]);
     }
 
-    // 4. Validate Word
+    // 4. Validate Word length & Dictionary
     if (strlen(guess) != 5)
     {
         send_response(socket, 400, "application/json", "{\"error\":\"Guess must be 5 letters\"}");
@@ -175,23 +173,56 @@ void handle_guess(int socket, char *request)
         return;
     }
 
-    // 5. Check Session
-    char *secret_word = get_secret_word(session_id);
-    if (secret_word == NULL)
+    // 5. Get Full Game State (To track attempts)
+    // NOTE: You must implement get_game_state in game_state.c (see below)
+    GameState *game = get_game_state(session_id);
+    
+    if (game == NULL)
     {
         printf("DEBUG: Session '%s' not found!\n", session_id);
         send_response(socket, 404, "application/json", "{\"error\":\"Session not found\"}");
         return;
     }
 
-    // 6. Evaluate
-    int *result = evaluateGuess(secret_word, guess);
-    char *json_result = createJsonResult(result);
+    // 6. Evaluate Logic
+    int *result = evaluateGuess(game->secret_word, guess);
+    
+    // Increment attempts
+    game->attempts++;
 
-    send_response(socket, 200, "application/json", json_result);
+    // Check if player won (all 2s)
+    int won = 1;
+    for(int i=0; i<5; i++) {
+        if(result[i] != 2) won = 0;
+    }
+
+    // 7. Construct JSON Response
+    char json_response[512]; // Large buffer for safety
+    char result_str[6];
+    
+    // Convert int array (2,0,1,2,0) to string "20120"
+    for(int i=0; i<5; i++) result_str[i] = '0' + result[i];
+    result_str[5] = '\0';
+
+    if (won) {
+        snprintf(json_response, sizeof(json_response), 
+            "{\"result\":\"%s\", \"status\":\"won\", \"attempts\":%d}", 
+            result_str, game->attempts);
+    } 
+    else if (game->attempts >= 6) {
+        snprintf(json_response, sizeof(json_response), 
+            "{\"result\":\"%s\", \"status\":\"lost\", \"secretWord\":\"%s\"}", 
+            result_str, game->secret_word);
+    } 
+    else {
+        snprintf(json_response, sizeof(json_response), 
+            "{\"result\":\"%s\", \"status\":\"active\", \"attempts\":%d}", 
+            result_str, game->attempts);
+    }
+
+    send_response(socket, 200, "application/json", json_response);
     
     free(result);
-    free(json_result);
 }
 
 void send_response(int socket, int status_code, const char *content_type, const char *body)

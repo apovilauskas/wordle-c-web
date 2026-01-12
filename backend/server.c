@@ -1,17 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>        // Replaces winsock specific logic
-#include <sys/socket.h>    // Linux socket headers
-#include <netinet/in.h>    // Linux address headers
+#include <unistd.h>        
+#include <sys/socket.h>    
+#include <netinet/in.h>
 #include "http_handler.h"
 #include "game_state.h"
 #include "words.h"
 #include <time.h>
-
-
-
-
 
 int main() {
     int server_fd, new_socket;

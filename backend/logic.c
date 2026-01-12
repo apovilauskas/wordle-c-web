@@ -10,7 +10,7 @@ int* evaluateGuess(const char* secret_word, const char* guess) {
     int* array = calloc(5, sizeof(int));
     int secret_used[5] = {0, 0, 0, 0, 0};
 
-    // Pass 1: Greens
+    // Pass 1: Green
     for (int i = 0; i < 5; i++) {
         if (secret_word[i] == guess[i]) {
             array[i] = 2;
@@ -18,14 +18,14 @@ int* evaluateGuess(const char* secret_word, const char* guess) {
         }
     }
 
-    // Pass 2: Yellows
+    // Pass 2: Yellow
     for (int i = 0; i < 5; i++) {
         if (array[i] == 0) {
             for (int j = 0; j < 5; j++) {
                 if (!secret_used[j] && guess[i] == secret_word[j]) {
                     array[i] = 1;
                     secret_used[j] = 1;
-                    break; // Move to next 'i'
+                    break;
                 }
             }
         }
