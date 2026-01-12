@@ -2,12 +2,15 @@
 #define WORDS_H
 
 void loadDictionary(const char *filepath);
-// use i/o to store the words from words.txt into a dynamic array
+// Load words.txt into a dynamic array for guess validation
+
+void loadSecretDictionary(const char *filepath);
+// Load secret.txt into a dynamic array for selecting secret words
 
 const char* selectSecretWord();
-//use rand, srand along with total word count to pick a random word
+// Use rand() with secret word count to pick a random word from secret.txt
 
 int isValidGuess(const char* guess);
-//bool function to check if guessed word is in the list
+// Check if guessed word is in the dictionary (words.txt)
 
 #endif

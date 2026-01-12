@@ -17,6 +17,7 @@ int main() {
 
     srand(time(NULL));
     loadDictionary("/app/backend/words.txt");
+    loadSecretDictionary("/app/backend/secret.txt");
     init_game_states();
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
