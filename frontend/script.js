@@ -343,10 +343,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyboard = document.getElementById("keyboard");
 
     keyboard.addEventListener("click", async (e) => {
-        if (inputBlocked) return;
+    if (inputBlocked) return;
 
-        const key = e.target.closest(".key");
-        if (!key) return;
+    const key = e.target.closest(".key");
+    if (!key) return;
+
+
+    key.classList.add("pressed");
+        setTimeout(() => key.classList.remove("pressed"), 100);
 
         if (key.id === "backspace") {
             removeLetter();
