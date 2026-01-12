@@ -51,27 +51,10 @@ void serve_file(int socket, const char *path, const char *content_type)
 void handle_http_request(int socket)
 {
     char buffer[BUFFER_SIZE] = {0};
-    int total_bytes = 0;
+    int bytes_received = recv(socket, buffer, BUFFER_SIZE, 0);
     
-    int bytes = recv(socket, buffer, BUFFER_SIZE - 1, 0);
-    if (bytes <= 0) return;
-    total_bytes = bytes;
-
-    if (strstr(buffer, "POST")) {
-        // Look for the end of headers marker
-        char *body_start = strstr(buffer, "\r\n\r\n");
-        
-        while (body_start == NULL || strstr(body_start, "}") == NULL) {
-            int extra = recv(socket, buffer + total_bytes, BUFFER_SIZE - 1 - total_bytes, 0);
-            if (extra <= 0) break; // Connection closed or error
-            total_bytes += extra;
-            buffer[total_bytes] = '\0'; // Keep it null-terminated
-            body_start = strstr(buffer, "\r\n\r\n"); // Re-check body start
-            
-            // Safety break: don't loop forever if it's a huge/bad request
-            if (total_bytes >= BUFFER_SIZE - 1) break;
-        }
-    }
+    if (bytes_received <= 0) return;
+    usleep(10000);
 
     char method[16], path[256], version[16];
     sscanf(buffer, "%s %s %s", method, path, version);
