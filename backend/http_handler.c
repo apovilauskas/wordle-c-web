@@ -1,3 +1,5 @@
+c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,11 +53,104 @@ void serve_file(int socket, const char *path, const char *content_type)
 void handle_http_request(int socket)
 {
     char buffer[BUFFER_SIZE] = {0};
-    int bytes_received = recv(socket, buffer, BUFFER_SIZE, 0);
-    
-    if (bytes_received <= 0)
-        return;
+    size_t total_received = 0;
+    char *header_end = NULL;
+    long content_length = -1; // -1 means not found yet
 
+    while (total_received < BUFFER_SIZE - 1)
+    {
+        int bytes = recv(socket, buffer + total_received, BUFFER_SIZE - 1 - total_received, 0);
+        if (bytes <= 0)
+        {
+            // Error or connection closed
+            return;
+        }
+        total_received += bytes;
+        buffer[total_received] = '\0';
+
+        if (!header_end)
+        {
+            header_end = strstr(buffer, "\r\n\r\n");
+            if (header_end)
+            {
+                // Temporarily null-terminate headers for parsing
+                *header_end = '\0';
+
+                // Parse headers to find Content-Length
+                char *header_str = buffer;
+                // Skip request line
+                char *line = strstr(header_str, "\r\n");
+                if (line)
+                {
+                    header_str = line + 2;
+                }
+
+                while (header_str && *header_str)
+                {
+                    if (strncasecmp(header_str, "Content-Length:", 15) == 0)
+                    {
+                        char *value_start = header_str + 15;
+                        while (*value_start == ' ') value_start++; // Skip spaces
+                        content_length = atol(value_start);
+                        break; // We only need Content-Length for now
+                    }
+                    line = strstr(header_str, "\r\n");
+                    if (line)
+                    {
+                        header_str = line + 2;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                // Restore the buffer
+                *header_end = '\r';
+
+                // If no Content-Length, assume 0
+                if (content_length == -1)
+                {
+                    content_length = 0;
+                }
+
+                // Calculate expected total size
+                size_t headers_size = (header_end - buffer) + 4;
+                size_t expected_total = headers_size + content_length;
+
+                if (expected_total > BUFFER_SIZE - 1)
+                {
+                    send_response(socket, 413, "text/plain", "Payload Too Large");
+                    return;
+                }
+
+                // If we already have the full body, break
+                if (total_received >= expected_total)
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // Headers found, continuing to receive body
+            size_t headers_size = (header_end - buffer) + 4;
+            size_t expected_total = headers_size + content_length;
+            if (total_received >= expected_total)
+            {
+                break;
+            }
+        }
+    }
+
+    // Check if request is complete
+    if (!header_end || (content_length >= 0 && total_received < ((header_end - buffer) + 4 + content_length)))
+    {
+        send_response(socket, 400, "text/plain", "Incomplete request");
+        return;
+    }
+
+    // Parse method, path, version from the request line
     char method[16], path[256], version[16];
     sscanf(buffer, "%s %s %s", method, path, version);
 
@@ -167,24 +262,21 @@ void handle_guess(int socket, char *request)
     //    return;
     //}
 
-if (!isValidGuess(guess))
-{
-    // Debugging output
-    printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
-    for(int i = 0; i < strlen(guess); i++) {
-        printf("Char %d = '%c' (%d)\n", i, guess[i], (int)guess[i]);
+    if (!isValidGuess(guess))
+    {
+        // Debugging output
+        printf("DEBUG: Word received: '%s' | strlen: %zu\n", guess, strlen(guess));
+        for(int i = 0; i < strlen(guess); i++) {
+            printf("Char %d = '%c' (%d)\n", i, guess[i], (int)guess[i]);
+        }
+
+        // Send error response with debug info
+        char buffer[128];
+        snprintf(buffer, sizeof(buffer), "{\"error\":\"Invalid word\",\"debug\":\"%s\"}", guess);
+        send_response(socket, 200, "application/json", buffer);
+
+        return;
     }
-
-    // Send error response with debug info
-    char buffer[128];
-    snprintf(buffer, sizeof(buffer), "{\"error\":\"Invalid word\",\"debug\":\"%s\"}", guess);
-    send_response(socket, 200, "application/json", buffer);
-
-    return;
-}
-
-
-
     // 5. Get Full Game State (To track attempts)
     // NOTE: You must implement get_game_state in game_state.c (see below)
     GameState *game = get_game_state(session_id);
